@@ -133,3 +133,6 @@ This project was migrated from:
 SQLite was chosen for easier development setup (no database server installation required).
 
 See [walkthrough.md](file:///C:/Users/iamsa/.gemini/antigravity/brain/5f046668-4cde-4544-abfc-aaf6cdc09b05/walkthrough.md) for complete migration details.
+
+## Deployment Status
+Deployed on Vercel & Render
