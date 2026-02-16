@@ -17,15 +17,15 @@ const connectDB = async () => {
         console.log('✅ Database synced');
 
         // Seed menu items
-        const seedMenu = require('../seedMenu');
+        const seedMenu = require('../scripts/seedMenu');
         await seedMenu();
 
         // Seed admin user
-        const seedAdmin = require('../seedAdmin');
+        const seedAdmin = require('../scripts/seedAdmin');
         await seedAdmin();
 
         // Seed rooms
-        const seedRooms = require('../seedRooms');
+        const seedRooms = require('../scripts/seedRooms');
         await seedRooms();
     } catch (error) {
         console.error('❌ Error: ' + error.message);

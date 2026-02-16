@@ -49,10 +49,29 @@ const getRoom = async (req, res) => {
 // @access  Private
 const createRoom = async (req, res) => {
     try {
+        // Check if room number already exists
+        const existingRoom = await Room.findOne({ where: { roomNumber: req.body.roomNumber } });
+        if (existingRoom) {
+            return res.status(400).json({ message: `Room ${req.body.roomNumber} already exists` });
+        }
+
         const room = await Room.create(req.body);
         res.status(201).json(room);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error('Room creation error:', error);
+
+        // Handle Sequelize unique constraint error
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ message: `Room ${req.body.roomNumber} already exists` });
+        }
+
+        // Handle Sequelize validation error
+        if (error.name === 'SequelizeValidationError') {
+            const validationErrors = error.errors.map(e => e.message).join(', ');
+            return res.status(400).json({ message: validationErrors });
+        }
+
+        res.status(400).json({ message: error.message || 'Failed to create room' });
     }
 };
 

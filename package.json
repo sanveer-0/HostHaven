@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed:admin": "node scripts/seedAdmin.js",
+    "seed:rooms": "node scripts/seedRooms.js",
+    "seed:menu": "node scripts/seedMenu.js",
+    "seed:all": "npm run seed:admin && npm run seed:rooms && npm run seed:menu",
+    "create:admin": "node scripts/createAdmin.js"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +21,11 @@
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.17.1",
+    "pdfkit": "^0.17.2",
     "qrcode": "^1.5.4",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",

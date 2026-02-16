@@ -27,6 +27,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/room-tokens', require('./routes/roomTokens'));
 app.use('/api/service-requests', require('./routes/serviceRequests'));
 app.use('/api/menu', require('./routes/menu'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Error handler
 app.use((err, req, res, next) => {

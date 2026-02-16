@@ -243,10 +243,15 @@ const checkoutBooking = async (req, res) => {
 
         const totalAmount = roomCharges + serviceCharges;
 
+        // Get current time in HH:MM format
+        const now = new Date();
+        const checkOutTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
         // Update booking
         booking.bookingStatus = 'checked-out';
         booking.totalAmount = totalAmount;
         booking.checkOutDate = checkOut;
+        booking.checkOutTime = checkOutTime; // Add checkout time
         booking.paymentStatus = 'pending';
         await booking.save();
 
@@ -275,7 +280,9 @@ const checkoutBooking = async (req, res) => {
             booking: {
                 id: booking.id,
                 checkInDate: booking.checkInDate,
+                checkInTime: booking.checkInTime,
                 checkOutDate: checkOut,
+                checkOutTime: checkOutTime,
                 nights: nights
             },
             guest: {

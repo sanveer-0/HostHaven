@@ -39,6 +39,16 @@ const Booking = sequelize.define('Booking', {
             isDate: true
         }
     },
+    checkInTime: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    checkOutTime: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     numberOfGuests: {
         type: DataTypes.INTEGER,
         allowNull: false,

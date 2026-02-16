@@ -1,0 +1,165 @@
+✅ Connected to database
+
+📊 DATABASE TABLES:
+
+================================================================================
+
+📋 Table: bookings
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  guestId                   INTEGER              NOT NULL      
+  roomId                    INTEGER              NOT NULL      
+  checkInDate               DATETIME             NOT NULL      
+  checkOutDate              DATETIME             NOT NULL      
+  numberOfGuests            INTEGER              NOT NULL      
+  totalAmount               DECIMAL(10,2)        NOT NULL      
+  paymentStatus             TEXT                 NULL          DEFAULT 'pending'
+  bookingStatus             TEXT                 NULL          DEFAULT 'confirmed'
+  specialRequests           TEXT                 NULL          DEFAULT ''
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 10
+
+📋 Table: guests
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  name                      VARCHAR(255)         NOT NULL      
+  email                     VARCHAR(255)         NOT NULL      
+  phone                     VARCHAR(50)          NOT NULL      
+  address                   TEXT                 NOT NULL      
+  idProofType               TEXT                 NOT NULL      
+  idProofNumber             VARCHAR(100)         NOT NULL      
+  checkInDate               DATETIME             NULL          
+  checkOutDate              DATETIME             NULL          
+  status                    TEXT                 NULL          DEFAULT 'active'
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 10
+
+📋 Table: guests_backup
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  name                      VARCHAR(255)         NOT NULL      
+  email                     VARCHAR(255)         NOT NULL      
+  phone                     VARCHAR(50)          NOT NULL      
+  address                   TEXT                 NOT NULL      
+  idProofType               TEXT                 NOT NULL      
+  idProofNumber             VARCHAR(100)         NOT NULL      
+  checkInDate               DATETIME             NULL          
+  checkOutDate              DATETIME             NULL          
+  status                    TEXT                 NULL          DEFAULT 'active'
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 1
+
+📋 Table: menu_items
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  name                      VARCHAR(100)         NOT NULL      
+  description               TEXT                 NULL          
+  category                  TEXT                 NOT NULL      
+  price                     DECIMAL(10,2)        NOT NULL      
+  isAvailable               TINYINT(1)           NOT NULL      DEFAULT 1
+  image                     VARCHAR(255)         NULL          
+  isVegetarian              TINYINT(1)           NOT NULL      DEFAULT 1
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 24
+
+📋 Table: payments
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  bookingId                 INTEGER              NOT NULL      
+  amount                    DECIMAL(10,2)        NOT NULL      
+  paymentMethod             TEXT                 NOT NULL      
+  transactionId             VARCHAR(255)         NULL          DEFAULT ''
+  paymentDate               DATETIME             NULL          
+  status                    TEXT                 NULL          DEFAULT 'success'
+  notes                     TEXT                 NULL          DEFAULT ''
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 4
+
+📋 Table: room_tokens
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  roomId                    INTEGER              NOT NULL      
+  bookingId                 INTEGER              NOT NULL      
+  token                     UUID                 NOT NULL      
+  isActive                  TINYINT(1)           NOT NULL      DEFAULT 1
+  expiresAt                 DATETIME             NULL          
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 1
+
+📋 Table: rooms
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  roomNumber                VARCHAR(50)          NOT NULL      
+  type                      TEXT                 NOT NULL      
+  capacity                  INTEGER              NOT NULL      
+  pricePerNight             DECIMAL(10,2)        NOT NULL      
+  amenities                 JSON                 NULL          DEFAULT '[]'
+  status                    TEXT                 NULL          DEFAULT 'available'
+  images                    JSON                 NULL          DEFAULT '[]'
+  description               TEXT                 NULL          DEFAULT ''
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 5
+
+📋 Table: service_requests
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  bookingId                 INTEGER              NULL          
+  roomId                    INTEGER              NOT NULL      
+  type                      TEXT                 NOT NULL      
+  items                     JSON                 NULL          
+  description               TEXT                 NULL          
+  specialInstructions       TEXT                 NULL          
+  totalAmount               DECIMAL(10,2)        NOT NULL      DEFAULT 0
+  status                    TEXT                 NOT NULL      DEFAULT 'pending'
+  staffNotes                TEXT                 NULL          
+  requestedAt               DATETIME             NOT NULL      
+  completedAt               DATETIME             NULL          
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 3
+
+📋 Table: sqlite_sequence
+--------------------------------------------------------------------------------
+Columns:
+  name                                           NULL          
+  seq                                            NULL          
+
+  📈 Total Records: 7
+
+📋 Table: users
+--------------------------------------------------------------------------------
+Columns:
+  id                        INTEGER              NULL         🔑 PRIMARY KEY 
+  username                  VARCHAR(100)         NOT NULL      
+  email                     VARCHAR(255)         NOT NULL      
+  password                  VARCHAR(255)         NOT NULL      
+  role                      TEXT                 NULL          DEFAULT 'staff'
+  createdAt                 DATETIME             NOT NULL      
+  updatedAt                 DATETIME             NOT NULL      
+
+  📈 Total Records: 1
+
+================================================================================
