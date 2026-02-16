@@ -3,10 +3,10 @@ const QRCode = require('qrcode');
 /**
  * Generate QR code for room service access
  * @param {string} roomNumber - Room number
- * @param {string} baseUrl - Base URL for the application (e.g., http://localhost:3000)
+ * @param {string} baseUrl - Base URL for the application (defaults to env variable or localhost)
  * @returns {Promise<string>} Base64 encoded QR code image
  */
-const generateRoomQRCode = async (roomNumber, baseUrl = 'http://localhost:3000') => {
+const generateRoomQRCode = async (roomNumber, baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000') => {
     try {
         const url = `${baseUrl}/room-service?room=${roomNumber}`;
 
@@ -33,10 +33,10 @@ const generateRoomQRCode = async (roomNumber, baseUrl = 'http://localhost:3000')
 /**
  * Generate QR code as buffer for saving to file
  * @param {string} roomNumber - Room number
- * @param {string} baseUrl - Base URL for the application
+ * @param {string} baseUrl - Base URL for the application (defaults to env variable or localhost)
  * @returns {Promise<Buffer>} QR code image buffer
  */
-const generateRoomQRCodeBuffer = async (roomNumber, baseUrl = 'http://localhost:3000') => {
+const generateRoomQRCodeBuffer = async (roomNumber, baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000') => {
     try {
         const url = `${baseUrl}/room-service?room=${roomNumber}`;
 
