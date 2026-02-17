@@ -19,11 +19,17 @@ export default function RoomsPage() {
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [roomBookings, setRoomBookings] = useState<Booking[]>([]);
     const [loadingBookings, setLoadingBookings] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        roomNumber: string;
+        type: Room['type'];
+        pricePerNight: string | number;
+        capacity: string | number;
+        status: Room['status'];
+    }>({
         roomNumber: '',
         type: 'single',
-        pricePerNight: '' as string | number,
-        capacity: '' as string | number,
+        pricePerNight: '',
+        capacity: '',
         status: 'available',
     });
 
@@ -91,7 +97,7 @@ export default function RoomsPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this room?')) return;
 
         try {
@@ -328,7 +334,7 @@ export default function RoomsPage() {
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Room Type</label>
                                 <select
                                     value={formData.type}
-                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, type: e.target.value as Room['type'] })}
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
                                 >
                                     <option value="single">Single</option>
@@ -369,7 +375,7 @@ export default function RoomsPage() {
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Status</label>
                                 <select
                                     value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Room['status'] })}
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
                                 >
                                     <option value="available">Available</option>
