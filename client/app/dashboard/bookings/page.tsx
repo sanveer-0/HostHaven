@@ -144,13 +144,13 @@ export default function BookingsPage() {
             // Then create the booking with check-in time
             await bookingsAPI.create({
                 guestId: guest.id,
-                roomId: formData.roomId,
+                roomId: parseInt(formData.roomId),
                 checkInDate: formData.checkInDate,
                 checkOutDate: formData.checkOutDate,
                 checkInTime: currentTime, // Add current time
                 numberOfGuests: formData.numberOfGuests,
                 totalAmount: totalAmount,
-                bookingStatus: formData.bookingStatus,
+                bookingStatus: formData.bookingStatus as any,
             });
 
             setShowModal(false);
