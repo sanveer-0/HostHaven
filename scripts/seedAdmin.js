@@ -1,5 +1,4 @@
 const { User } = require('../models');
-const bcrypt = require('bcryptjs');
 
 const seedAdmin = async () => {
     try {
@@ -10,12 +9,11 @@ const seedAdmin = async () => {
             return;
         }
 
-        // Create admin user
-        const hashedPassword = await bcrypt.hash('admin123', 10);
+        // Create admin user - pass plain password, model's beforeSave hook will hash it
         await User.create({
             username: 'admin',
             email: 'admin@hosthaven.com',
-            password: hashedPassword,
+            password: 'admin123',
             role: 'admin'
         });
 
