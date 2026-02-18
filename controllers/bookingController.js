@@ -19,7 +19,7 @@ const getBookings = async (req, res) => {
                     attributes: ['roomNumber', 'type', 'pricePerNight']
                 }
             ],
-            order: [['createdAt', 'DESC']]
+            order: [['checkInDate', 'DESC']]
         });
         res.json(bookings);
     } catch (error) {

@@ -299,220 +299,223 @@ export default function BookingsPage() {
             {/* Create Booking Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-8 animate-scale-in border border-white/10">
-                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col animate-scale-in border border-white/10">
+                        <div className="flex-none flex items-center justify-between p-6 border-b border-white/10">
                             <h3 className="text-2xl font-bold text-slate-100">New Booking</h3>
                             <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors">
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Room & Booking Details - FIRST */}
-                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-door-open text-cyan-400"></i>
-                                    Room & Booking Details
-                                </h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Select Room *</label>
-                                        <select
-                                            value={formData.roomId}
-                                            onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
-                                            required
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
-                                        >
-                                            <option value="" className="bg-slate-800">Select a room</option>
-                                            {rooms.map(room => (
-                                                <option key={room.id} value={room.id} className="bg-slate-800 text-slate-100">{room.roomNumber} - {room.type} (${room.pricePerNight}/night)</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Check In Date *</label>
-                                        <input
-                                            type="date"
-                                            value={formData.checkInDate}
-                                            onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
-                                            required
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Check Out Date *</label>
-                                        <input
-                                            type="date"
-                                            value={formData.checkOutDate}
-                                            onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
-                                            required
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
-                                        />
-                                    </div>
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">
-                                            Total Number of Guests *
-                                            {selectedRoom && <span className="text-xs text-slate-500 ml-2">(Max: {maxGuests})</span>}
-                                        </label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            max={maxGuests}
-                                            value={formData.numberOfGuests}
-                                            onChange={(e) => handleGuestCountChange(parseInt(e.target.value) || 1)}
-                                            required
-                                            disabled={!formData.roomId}
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        />
-                                        {!formData.roomId && (
-                                            <p className="text-xs text-amber-500/80 mt-1">Please select a room first</p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Primary Guest Information - SECOND */}
-                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-user-tie text-blue-400"></i>
-                                    Primary Guest Information
-                                </h4>
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Full Name *</label>
-                                        <input
-                                            type="text"
-                                            value={formData.primaryGuest.name}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, name: e.target.value } })}
-                                            required
-                                            placeholder="John Doe"
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Email *</label>
-                                        <input
-                                            type="email"
-                                            value={formData.primaryGuest.email}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, email: e.target.value } })}
-                                            required
-                                            placeholder="john@example.com"
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Phone *</label>
-                                        <input
-                                            type="tel"
-                                            value={formData.primaryGuest.phone}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, phone: e.target.value } })}
-                                            required
-                                            placeholder="+91 98765 43210"
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Type *</label>
-                                        <select
-                                            value={formData.primaryGuest.idProofType}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofType: e.target.value } })}
-                                            required
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
-                                        >
-                                            <option value="national_id">National ID / Aadhar</option>
-                                            <option value="passport">Passport</option>
-                                            <option value="driving_license">Driving License</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Number *</label>
-                                        <input
-                                            type="text"
-                                            value={formData.primaryGuest.idProofNumber}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofNumber: e.target.value } })}
-                                            required
-                                            placeholder="1234 5678 9012"
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Address *</label>
-                                        <input
-                                            type="text"
-                                            value={formData.primaryGuest.address}
-                                            onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, address: e.target.value } })}
-                                            required
-                                            placeholder="123 Beach Street, Mumbai"
-                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Secondary Guests - THIRD */}
-                            {formData.numberOfGuests > 1 && (
+                        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-track-slate-800/50 scrollbar-thumb-slate-600 hover:scrollbar-thumb-slate-500">
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Room & Booking Details - FIRST */}
                                 <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
-                                    <div className="mb-4">
-                                        <h4 className="text-lg font-bold text-slate-200 flex items-center gap-2">
-                                            <i className="fa-solid fa-users text-teal-400"></i>
-                                            Secondary Guests ({formData.secondaryGuests.length})
-                                        </h4>
-                                        <p className="text-xs text-slate-400 mt-1">
-                                            Forms auto-generated based on total guest count
-                                        </p>
+                                    <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                        <i className="fa-solid fa-door-open text-cyan-400"></i>
+                                        Room & Booking Details
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Select Room *</label>
+                                            <select
+                                                value={formData.roomId}
+                                                onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                                                required
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
+                                            >
+                                                <option value="" className="bg-slate-800">Select a room</option>
+                                                {rooms.map(room => (
+                                                    <option key={room.id} value={room.id} className="bg-slate-800 text-slate-100">{room.roomNumber} - {room.type} (${room.pricePerNight}/night)</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Check In Date *</label>
+                                            <input
+                                                type="date"
+                                                value={formData.checkInDate}
+                                                onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
+                                                required
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Check Out Date *</label>
+                                            <input
+                                                type="date"
+                                                value={formData.checkOutDate}
+                                                onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
+                                                required
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">
+                                                Total Number of Guests *
+                                                {selectedRoom && <span className="text-xs text-slate-500 ml-2">(Max: {maxGuests})</span>}
+                                            </label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max={maxGuests}
+                                                value={formData.numberOfGuests}
+                                                onChange={(e) => handleGuestCountChange(parseInt(e.target.value) || 1)}
+                                                required
+                                                disabled={!formData.roomId}
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            />
+                                            {!formData.roomId && (
+                                                <p className="text-xs text-amber-500/80 mt-1">Please select a room first</p>
+                                            )}
+                                        </div>
                                     </div>
-                                    {formData.secondaryGuests.length > 0 ? (
-                                        <div className="space-y-3">
-                                            {formData.secondaryGuests.map((guest, index) => (
-                                                <div key={index} className="bg-slate-900/50 p-4 rounded-lg border border-white/5">
-                                                    <p className="text-sm font-semibold text-slate-300 mb-3">Guest #{index + 2}</p>
-                                                    <div className="grid grid-cols-3 gap-3">
-                                                        <div className="col-span-2">
-                                                            <label className="block text-xs font-semibold text-slate-400 mb-1">Name</label>
-                                                            <input
-                                                                type="text"
-                                                                value={guest.name}
-                                                                onChange={(e) => updateSecondaryGuest(index, 'name', e.target.value)}
-                                                                placeholder="Guest name"
-                                                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-xs font-semibold text-slate-400 mb-1">Age</label>
-                                                            <input
-                                                                type="number"
-                                                                min="1"
-                                                                value={guest.age}
-                                                                onChange={(e) => updateSecondaryGuest(index, 'age', parseInt(e.target.value))}
-                                                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/50"
-                                                            />
+                                </div>
+
+                                {/* Primary Guest Information - SECOND */}
+                                <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                    <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                        <i className="fa-solid fa-user-tie text-blue-400"></i>
+                                        Primary Guest Information
+                                    </h4>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Full Name *</label>
+                                            <input
+                                                type="text"
+                                                value={formData.primaryGuest.name}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, name: e.target.value } })}
+                                                required
+                                                placeholder="John Doe"
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Email *</label>
+                                            <input
+                                                type="email"
+                                                value={formData.primaryGuest.email}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, email: e.target.value } })}
+                                                required
+                                                placeholder="john@example.com"
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Phone *</label>
+                                            <input
+                                                type="tel"
+                                                value={formData.primaryGuest.phone}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, phone: e.target.value } })}
+                                                required
+                                                placeholder="+91 98765 43210"
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Type *</label>
+                                            <select
+                                                value={formData.primaryGuest.idProofType}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofType: e.target.value } })}
+                                                required
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
+                                            >
+                                                <option value="national_id">National ID / Aadhar</option>
+                                                <option value="passport">Passport</option>
+                                                <option value="driving_license">Driving License</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Number *</label>
+                                            <input
+                                                type="text"
+                                                value={formData.primaryGuest.idProofNumber}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofNumber: e.target.value } })}
+                                                required
+                                                placeholder="1234 5678 9012"
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Address *</label>
+                                            <input
+                                                type="text"
+                                                value={formData.primaryGuest.address}
+                                                onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, address: e.target.value } })}
+                                                required
+                                                placeholder="123 Beach Street, Mumbai"
+                                                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Secondary Guests - THIRD */}
+                                {formData.numberOfGuests > 1 && (
+                                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                        <div className="mb-4">
+                                            <h4 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                                                <i className="fa-solid fa-users text-teal-400"></i>
+                                                Secondary Guests ({formData.secondaryGuests.length})
+                                            </h4>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                Forms auto-generated based on total guest count
+                                            </p>
+                                        </div>
+                                        {formData.secondaryGuests.length > 0 ? (
+                                            <div className="space-y-3">
+                                                {formData.secondaryGuests.map((guest, index) => (
+                                                    <div key={index} className="bg-slate-900/50 p-4 rounded-lg border border-white/5">
+                                                        <p className="text-sm font-semibold text-slate-300 mb-3">Guest #{index + 2}</p>
+                                                        <div className="grid grid-cols-3 gap-3">
+                                                            <div className="col-span-2">
+                                                                <label className="block text-xs font-semibold text-slate-400 mb-1">Name</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={guest.name}
+                                                                    onChange={(e) => updateSecondaryGuest(index, 'name', e.target.value)}
+                                                                    placeholder="Guest name"
+                                                                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-xs font-semibold text-slate-400 mb-1">Age</label>
+                                                                <input
+                                                                    type="number"
+                                                                    min="1"
+                                                                    value={guest.age}
+                                                                    onChange={(e) => updateSecondaryGuest(index, 'age', parseInt(e.target.value))}
+                                                                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/50"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-slate-500 italic">Increase guest count to add secondary guests</p>
-                                    )}
-                                </div>
-                            )}
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-slate-500 italic">Increase guest count to add secondary guests</p>
+                                        )}
+                                    </div>
+                                )}
 
-                            <div className="flex gap-3 pt-4 border-t border-white/10">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-900/20"
-                                >
-                                    Create Booking
-                                </button>
-                            </div>
-                        </form>
+                                <div className="flex gap-3 pt-4 border-t border-white/10">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                        className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-900/20"
+                                    >
+                                        Create Booking
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
