@@ -92,36 +92,36 @@ export default function ReportsPage() {
 
     return (
         <>
-            <header className="px-8 py-6 border-b border-white/60 bg-white/50 backdrop-blur-sm">
+            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-800 mb-1">Reports & Export</h2>
-                        <p className="text-slate-600">Generate and download booking reports 📊</p>
+                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">Reports & Export</h2>
+                        <p className="text-slate-300">Generate and download booking reports 📊</p>
                     </div>
                 </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-8">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-4xl mx-auto space-y-6">
                     {/* Quick Date Range Buttons */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 mb-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">Quick Date Ranges</h3>
+                    <div className="glass-card-dark rounded-2xl p-6 border border-white/5">
+                        <h3 className="text-xl font-bold text-slate-100 mb-4">Quick Date Ranges</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button
                                 onClick={() => setQuickRange('thisYear')}
-                                className={`p-4 rounded-xl font-semibold transition-all ${reportType === 'thisYear'
-                                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg'
-                                    : 'bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200'
+                                className={`p-4 rounded-xl font-semibold transition-all border ${reportType === 'thisYear'
+                                    ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg border-transparent'
+                                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-white/10'
                                     }`}
                             >
                                 <i className="fa-solid fa-calendar-days text-2xl mb-2 block"></i>
-                                This Year (2026)
+                                This Year ({new Date().getFullYear()})
                             </button>
                             <button
                                 onClick={() => setQuickRange('allTime')}
-                                className={`p-4 rounded-xl font-semibold transition-all ${reportType === 'allTime'
-                                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg'
-                                    : 'bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200'
+                                className={`p-4 rounded-xl font-semibold transition-all border ${reportType === 'allTime'
+                                    ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg border-transparent'
+                                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-white/10'
                                     }`}
                             >
                                 <i className="fa-solid fa-infinity text-2xl mb-2 block"></i>
@@ -131,11 +131,11 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Custom Date Range */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 mb-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">Custom Date Range</h3>
+                    <div className="glass-card-dark rounded-2xl p-6 border border-white/5">
+                        <h3 className="text-xl font-bold text-slate-100 mb-4">Custom Date Range</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <label className="block text-sm font-semibold text-slate-400 mb-2">
                                     Start Date
                                 </label>
                                 <input
@@ -145,11 +145,11 @@ export default function ReportsPage() {
                                         setDateRange({ ...dateRange, startDate: e.target.value });
                                         setReportType('custom');
                                     }}
-                                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <label className="block text-sm font-semibold text-slate-400 mb-2">
                                     End Date
                                 </label>
                                 <input
@@ -159,19 +159,19 @@ export default function ReportsPage() {
                                         setDateRange({ ...dateRange, endDate: e.target.value });
                                         setReportType('custom');
                                     }}
-                                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* Export Options */}
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">Export Report</h3>
+                    <div className="glass-card-dark rounded-2xl p-6 border border-white/5">
+                        <h3 className="text-xl font-bold text-slate-100 mb-4">Export Report</h3>
 
                         {dateRange.startDate && dateRange.endDate && (
-                            <div className="mb-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                                <p className="text-sm text-blue-800">
+                            <div className="mb-4 p-4 bg-cyan-900/20 border-l-4 border-cyan-500 rounded">
+                                <p className="text-sm text-cyan-200">
                                     <i className="fa-solid fa-info-circle mr-2"></i>
                                     Selected Range: <strong>{new Date(dateRange.startDate).toLocaleDateString('en-IN')}</strong> to <strong>{new Date(dateRange.endDate).toLocaleDateString('en-IN')}</strong>
                                 </p>
@@ -182,51 +182,51 @@ export default function ReportsPage() {
                             <button
                                 onClick={() => handleExport('excel')}
                                 disabled={loading || !dateRange.startDate || !dateRange.endDate}
-                                className="p-6 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-slate-400 disabled:to-slate-500 text-white rounded-xl font-bold transition-all shadow-lg flex flex-col items-center gap-3"
+                                className="p-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:from-slate-700 disabled:to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg flex flex-col items-center gap-3 disabled:text-slate-500 disabled:cursor-not-allowed"
                             >
                                 <i className="fa-solid fa-file-excel text-4xl"></i>
                                 <span className="text-lg">Export as Excel</span>
-                                <span className="text-xs opacity-90">Download formatted spreadsheet with all booking details</span>
+                                <span className="text-xs opacity-90 font-medium">Download formatted spreadsheet with all booking details</span>
                             </button>
                         </div>
 
                         {loading && (
                             <div className="mt-6 text-center">
                                 <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-500 mb-2"></i>
-                                <p className="text-slate-600">Generating report...</p>
+                                <p className="text-slate-400">Generating report...</p>
                             </div>
                         )}
                     </div>
 
                     {/* Report Details Info */}
-                    <div className="mt-6 bg-white/70 backdrop-blur-sm rounded-2xl p-6">
-                        <h3 className="text-lg font-bold text-slate-800 mb-3">
-                            <i className="fa-solid fa-circle-info text-cyan-600 mr-2"></i>
+                    <div className="glass-card-dark rounded-2xl p-6 border border-white/5">
+                        <h3 className="text-lg font-bold text-slate-200 mb-3">
+                            <i className="fa-solid fa-circle-info text-cyan-500 mr-2"></i>
                             Report Includes
                         </h3>
-                        <ul className="space-y-2 text-slate-700">
+                        <ul className="space-y-2 text-slate-400">
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>All booking details (ID, dates, status, amounts)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>Primary and secondary guest information</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>Room details and pricing</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>Payment status and transaction details</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>Contact information (email, phone, address)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <i className="fa-solid fa-check text-green-600 mt-1"></i>
+                                <i className="fa-solid fa-check text-emerald-500 mt-1"></i>
                                 <span>ID proof details for verification</span>
                             </li>
                         </ul>

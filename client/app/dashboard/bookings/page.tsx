@@ -174,29 +174,29 @@ export default function BookingsPage() {
         switch (status) {
             case 'confirmed':
             case 'checked-in':
-                return 'bg-emerald-100 text-emerald-700 border-emerald-300';
+                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
             case 'pending':
-                return 'bg-amber-100 text-amber-700 border-amber-300';
+                return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
             case 'cancelled':
-                return 'bg-red-100 text-red-700 border-red-300';
+                return 'bg-red-500/20 text-red-400 border-red-500/30';
             case 'checked-out':
-                return 'bg-slate-100 text-slate-700 border-slate-300';
+                return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
             default:
-                return 'bg-slate-100 text-slate-700 border-slate-300';
+                return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
         }
     };
 
     return (
         <>
-            <header className="px-8 py-6 border-b border-white/60 bg-white/50 backdrop-blur-sm">
+            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-800 mb-1">All Bookings</h2>
-                        <p className="text-slate-600">Manage and track all reservations 📅</p>
+                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">All Bookings</h2>
+                        <p className="text-slate-300">Manage and track all reservations 📅</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg flex items-center gap-2"
+                        className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-cyan-900/30 flex items-center gap-2 border border-white/10"
                     >
                         <i className="fa-solid fa-plus"></i>
                         <span>New Booking</span>
@@ -205,33 +205,33 @@ export default function BookingsPage() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-8">
-                <div className="bg-white/70 backdrop-blur-sm border border-white/60 rounded-2xl overflow-hidden shadow-lg animate-fade-in">
+                <div className="glass-card-dark rounded-2xl overflow-hidden shadow-lg animate-fade-in border border-white/5">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-slate-50/50">
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Guest</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Room</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Check In</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Check Out</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Guests</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                                <tr className="bg-slate-800/50 border-b border-white/5">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Guest</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Room</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Check In</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Check Out</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Guests</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200">
+                            <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-12 text-center">
-                                            <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-500 mb-3"></i>
-                                            <p className="text-slate-600">Loading bookings...</p>
+                                            <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-400 mb-3"></i>
+                                            <p className="text-slate-400">Loading bookings...</p>
                                         </td>
                                     </tr>
                                 ) : bookings.length > 0 ? (
                                     bookings.map((booking) => (
                                         <tr
                                             key={booking.id}
-                                            className="hover:bg-cyan-50/30 transition-colors group"
+                                            className="hover:bg-white/5 transition-colors group cursor-pointer"
                                             onClick={() => {
                                                 setSelectedBooking(booking);
                                                 setShowDetailsModal(true);
@@ -239,28 +239,28 @@ export default function BookingsPage() {
                                         >
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold shadow-md">
+                                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-semibold shadow-lg shadow-cyan-900/30">
                                                         {booking.guest?.name?.[0] || 'U'}
                                                     </div>
-                                                    <span className="text-slate-800 font-medium">{booking.guest?.name || 'Unknown'}</span>
+                                                    <span className="text-slate-200 font-medium group-hover:text-cyan-300 transition-colors">{booking.guest?.name || 'Unknown'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-slate-700 font-medium">{booking.room?.roomNumber || 'N/A'}</span>
+                                                <span className="text-slate-300 font-medium">{booking.room?.roomNumber || 'N/A'}</span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="text-slate-600">
+                                                <div className="text-slate-400">
                                                     <div>{new Date(booking.checkInDate).toLocaleDateString()}</div>
-                                                    {booking.checkInTime && <div className="text-xs text-blue-600 font-semibold">{booking.checkInTime}</div>}
+                                                    {booking.checkInTime && <div className="text-xs text-cyan-400 font-semibold">{booking.checkInTime}</div>}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="text-slate-600">
+                                                <div className="text-slate-400">
                                                     <div>{new Date(booking.checkOutDate).toLocaleDateString()}</div>
-                                                    {booking.checkOutTime && <div className="text-xs text-blue-600 font-semibold">{booking.checkOutTime}</div>}
+                                                    {booking.checkOutTime && <div className="text-xs text-cyan-400 font-semibold">{booking.checkOutTime}</div>}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-slate-600">{booking.numberOfGuests}</td>
+                                            <td className="px-6 py-4 text-slate-400">{booking.numberOfGuests}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${getStatusColor(booking.bookingStatus)}`}>
                                                     {booking.bookingStatus}
@@ -273,7 +273,7 @@ export default function BookingsPage() {
                                                             e.stopPropagation();
                                                             handleCheckout(booking.id);
                                                         }}
-                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-semibold rounded-lg transition-all shadow-md flex items-center gap-2"
+                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold rounded-lg transition-all shadow-md border border-white/10 flex items-center gap-2"
                                                     >
                                                         <i className="fa-solid fa-right-from-bracket"></i>
                                                         Checkout
@@ -285,8 +285,8 @@ export default function BookingsPage() {
                                 ) : (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-12 text-center">
-                                            <i className="fa-solid fa-calendar-xmark text-4xl text-slate-300 mb-3"></i>
-                                            <p className="text-slate-500">No bookings found</p>
+                                            <i className="fa-solid fa-calendar-xmark text-4xl text-slate-600 mb-3 animate-pulse"></i>
+                                            <p className="text-slate-400">No bookings found</p>
                                         </td>
                                     </tr>
                                 )}
@@ -298,58 +298,58 @@ export default function BookingsPage() {
 
             {/* Create Booking Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-8 animate-scale-in">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-slate-800">New Booking</h3>
-                            <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 my-8 animate-scale-in border border-white/10">
+                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                            <h3 className="text-2xl font-bold text-slate-100">New Booking</h3>
+                            <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors">
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Room & Booking Details - FIRST */}
-                            <div className="bg-cyan-50 p-4 rounded-xl">
-                                <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-door-open text-cyan-600"></i>
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <i className="fa-solid fa-door-open text-cyan-400"></i>
                                     Room & Booking Details
                                 </h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Select Room *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Select Room *</label>
                                         <select
                                             value={formData.roomId}
                                             onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
                                             required
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                         >
-                                            <option value="">Select a room</option>
+                                            <option value="" className="bg-slate-800">Select a room</option>
                                             {rooms.map(room => (
-                                                <option key={room.id} value={room.id}>{room.roomNumber} - {room.type} (${room.pricePerNight}/night)</option>
+                                                <option key={room.id} value={room.id} className="bg-slate-800 text-slate-100">{room.roomNumber} - {room.type} (${room.pricePerNight}/night)</option>
                                             ))}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Check In Date *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Check In Date *</label>
                                         <input
                                             type="date"
                                             value={formData.checkInDate}
                                             onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
                                             required
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Check Out Date *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Check Out Date *</label>
                                         <input
                                             type="date"
                                             value={formData.checkOutDate}
                                             onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
                                             required
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
                                         />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">
                                             Total Number of Guests *
                                             {selectedRoom && <span className="text-xs text-slate-500 ml-2">(Max: {maxGuests})</span>}
                                         </label>
@@ -361,62 +361,62 @@ export default function BookingsPage() {
                                             onChange={(e) => handleGuestCountChange(parseInt(e.target.value) || 1)}
                                             required
                                             disabled={!formData.roomId}
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                                         />
                                         {!formData.roomId && (
-                                            <p className="text-xs text-amber-600 mt-1">Please select a room first</p>
+                                            <p className="text-xs text-amber-500/80 mt-1">Please select a room first</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Primary Guest Information - SECOND */}
-                            <div className="bg-blue-50 p-4 rounded-xl">
-                                <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-user-tie text-blue-600"></i>
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <i className="fa-solid fa-user-tie text-blue-400"></i>
                                     Primary Guest Information
                                 </h4>
                                 <div className="grid grid-cols-1 gap-4">
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Full Name *</label>
                                         <input
                                             type="text"
                                             value={formData.primaryGuest.name}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, name: e.target.value } })}
                                             required
                                             placeholder="John Doe"
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Email *</label>
                                         <input
                                             type="email"
                                             value={formData.primaryGuest.email}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, email: e.target.value } })}
                                             required
                                             placeholder="john@example.com"
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Phone *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Phone *</label>
                                         <input
                                             type="tel"
                                             value={formData.primaryGuest.phone}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, phone: e.target.value } })}
                                             required
                                             placeholder="+91 98765 43210"
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">ID Proof Type *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Type *</label>
                                         <select
                                             value={formData.primaryGuest.idProofType}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofType: e.target.value } })}
                                             required
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                         >
                                             <option value="national_id">National ID / Aadhar</option>
                                             <option value="passport">Passport</option>
@@ -425,25 +425,25 @@ export default function BookingsPage() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">ID Proof Number *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">ID Proof Number *</label>
                                         <input
                                             type="text"
                                             value={formData.primaryGuest.idProofNumber}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, idProofNumber: e.target.value } })}
                                             required
                                             placeholder="1234 5678 9012"
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Address *</label>
+                                        <label className="block text-sm font-semibold text-slate-400 mb-2">Address *</label>
                                         <input
                                             type="text"
                                             value={formData.primaryGuest.address}
                                             onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, address: e.target.value } })}
                                             required
                                             placeholder="123 Beach Street, Mumbai"
-                                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                         />
                                     </div>
                                 </div>
@@ -451,40 +451,40 @@ export default function BookingsPage() {
 
                             {/* Secondary Guests - THIRD */}
                             {formData.numberOfGuests > 1 && (
-                                <div className="bg-teal-50 p-4 rounded-xl">
+                                <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5">
                                     <div className="mb-4">
-                                        <h4 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <i className="fa-solid fa-users text-teal-600"></i>
+                                        <h4 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+                                            <i className="fa-solid fa-users text-teal-400"></i>
                                             Secondary Guests ({formData.secondaryGuests.length})
                                         </h4>
-                                        <p className="text-xs text-slate-600 mt-1">
+                                        <p className="text-xs text-slate-400 mt-1">
                                             Forms auto-generated based on total guest count
                                         </p>
                                     </div>
                                     {formData.secondaryGuests.length > 0 ? (
                                         <div className="space-y-3">
                                             {formData.secondaryGuests.map((guest, index) => (
-                                                <div key={index} className="bg-white p-4 rounded-lg border border-teal-200">
-                                                    <p className="text-sm font-semibold text-slate-700 mb-3">Guest #{index + 2}</p>
+                                                <div key={index} className="bg-slate-900/50 p-4 rounded-lg border border-white/5">
+                                                    <p className="text-sm font-semibold text-slate-300 mb-3">Guest #{index + 2}</p>
                                                     <div className="grid grid-cols-3 gap-3">
                                                         <div className="col-span-2">
-                                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Name</label>
+                                                            <label className="block text-xs font-semibold text-slate-400 mb-1">Name</label>
                                                             <input
                                                                 type="text"
                                                                 value={guest.name}
                                                                 onChange={(e) => updateSecondaryGuest(index, 'name', e.target.value)}
                                                                 placeholder="Guest name"
-                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-200"
+                                                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Age</label>
+                                                            <label className="block text-xs font-semibold text-slate-400 mb-1">Age</label>
                                                             <input
                                                                 type="number"
                                                                 min="1"
                                                                 value={guest.age}
                                                                 onChange={(e) => updateSecondaryGuest(index, 'age', parseInt(e.target.value))}
-                                                                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-200"
+                                                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/50"
                                                             />
                                                         </div>
                                                     </div>
@@ -497,17 +497,17 @@ export default function BookingsPage() {
                                 </div>
                             )}
 
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex gap-3 pt-4 border-t border-white/10">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all"
+                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-900/20"
                                 >
                                     Create Booking
                                 </button>
@@ -519,13 +519,13 @@ export default function BookingsPage() {
 
             {/* Booking Details Modal */}
             {showDetailsModal && selectedBooking && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-slate-800">Booking Details</h3>
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in border border-white/10">
+                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                            <h3 className="text-2xl font-bold text-slate-100">Booking Details</h3>
                             <button
                                 onClick={() => setShowDetailsModal(false)}
-                                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center"
+                                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors"
                             >
                                 <i className="fa-solid fa-times"></i>
                             </button>
@@ -533,101 +533,101 @@ export default function BookingsPage() {
 
                         <div className="space-y-6">
                             {/* Guest Information */}
-                            <div className="bg-blue-50 p-5 rounded-xl">
-                                <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-user text-blue-600"></i>
+                            <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">
+                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <i className="fa-solid fa-user text-blue-400"></i>
                                     Guest Information
                                 </h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Name</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.guest?.name || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Name</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.guest?.name || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Email</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.guest?.email || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Email</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.guest?.email || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Phone</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.guest?.phone || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Phone</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.guest?.phone || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Address</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.guest?.address || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Address</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.guest?.address || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">ID Proof Type</p>
-                                        <p className="text-sm font-semibold text-slate-800 capitalize">{selectedBooking.guest?.idProofType?.replace('_', ' ') || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">ID Proof Type</p>
+                                        <p className="text-sm font-semibold text-slate-100 capitalize">{selectedBooking.guest?.idProofType?.replace('_', ' ') || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">ID Proof Number</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.guest?.idProofNumber || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">ID Proof Number</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.guest?.idProofNumber || 'N/A'}</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Room Information */}
-                            <div className="bg-teal-50 p-5 rounded-xl">
-                                <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-door-open text-teal-600"></i>
+                            <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">
+                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <i className="fa-solid fa-door-open text-teal-400"></i>
                                     Room Information
                                 </h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Room Number</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.room?.roomNumber || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Room Number</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.room?.roomNumber || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Room Type</p>
-                                        <p className="text-sm font-semibold text-slate-800 capitalize">{selectedBooking.room?.type || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Room Type</p>
+                                        <p className="text-sm font-semibold text-slate-100 capitalize">{selectedBooking.room?.type || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Price per Night</p>
-                                        <p className="text-sm font-semibold text-slate-800">${selectedBooking.room?.pricePerNight || 'N/A'}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Price per Night</p>
+                                        <p className="text-sm font-semibold text-slate-100">${selectedBooking.room?.pricePerNight || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Capacity</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.room?.capacity || 'N/A'} guests</p>
+                                        <p className="text-xs text-slate-400 mb-1">Capacity</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.room?.capacity || 'N/A'} guests</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Booking Information */}
-                            <div className="bg-purple-50 p-5 rounded-xl">
-                                <h4 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                    <i className="fa-solid fa-calendar-check text-purple-600"></i>
+                            <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">
+                                <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                    <i className="fa-solid fa-calendar-check text-purple-400"></i>
                                     Booking Information
                                 </h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Check-In Date</p>
-                                        <p className="text-sm font-semibold text-slate-800">{new Date(selectedBooking.checkInDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
-                                        {selectedBooking.checkInTime && <p className="text-xs text-blue-600 font-semibold mt-1">@ {selectedBooking.checkInTime}</p>}
+                                        <p className="text-xs text-slate-400 mb-1">Check-In Date</p>
+                                        <p className="text-sm font-semibold text-slate-100">{new Date(selectedBooking.checkInDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                                        {selectedBooking.checkInTime && <p className="text-xs text-cyan-400 font-semibold mt-1">@ {selectedBooking.checkInTime}</p>}
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Check-Out Date</p>
-                                        <p className="text-sm font-semibold text-slate-800">{new Date(selectedBooking.checkOutDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
-                                        {selectedBooking.checkOutTime && <p className="text-xs text-blue-600 font-semibold mt-1">@ {selectedBooking.checkOutTime}</p>}
+                                        <p className="text-xs text-slate-400 mb-1">Check-Out Date</p>
+                                        <p className="text-sm font-semibold text-slate-100">{new Date(selectedBooking.checkOutDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                                        {selectedBooking.checkOutTime && <p className="text-xs text-cyan-400 font-semibold mt-1">@ {selectedBooking.checkOutTime}</p>}
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Number of Guests</p>
-                                        <p className="text-sm font-semibold text-slate-800">{selectedBooking.numberOfGuests}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Number of Guests</p>
+                                        <p className="text-sm font-semibold text-slate-100">{selectedBooking.numberOfGuests}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Total Amount</p>
-                                        <p className="text-sm font-semibold text-slate-800">${selectedBooking.totalAmount}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Total Amount</p>
+                                        <p className="text-sm font-semibold text-slate-100">${selectedBooking.totalAmount}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Payment Status</p>
-                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${selectedBooking.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
-                                            selectedBooking.paymentStatus === 'partial' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-red-100 text-red-700'
+                                        <p className="text-xs text-slate-400 mb-1">Payment Status</p>
+                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${selectedBooking.paymentStatus === 'paid' ? 'bg-green-500/20 text-green-400' :
+                                            selectedBooking.paymentStatus === 'partial' ? 'bg-amber-500/20 text-amber-400' :
+                                                'bg-red-500/20 text-red-400'
                                             }`}>
                                             {selectedBooking.paymentStatus}
                                         </span>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-600 mb-1">Booking Status</p>
+                                        <p className="text-xs text-slate-400 mb-1">Booking Status</p>
                                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${getStatusColor(selectedBooking.bookingStatus)}`}>
                                             {selectedBooking.bookingStatus}
                                         </span>
@@ -635,8 +635,8 @@ export default function BookingsPage() {
                                 </div>
                                 {selectedBooking.specialRequests && (
                                     <div className="mt-4">
-                                        <p className="text-xs text-slate-600 mb-1">Special Requests</p>
-                                        <p className="text-sm text-slate-800">{selectedBooking.specialRequests}</p>
+                                        <p className="text-xs text-slate-400 mb-1">Special Requests</p>
+                                        <p className="text-sm text-slate-100">{selectedBooking.specialRequests}</p>
                                     </div>
                                 )}
                             </div>
@@ -645,7 +645,7 @@ export default function BookingsPage() {
                         <div className="mt-6">
                             <button
                                 onClick={() => setShowDetailsModal(false)}
-                                className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-teal-500 hover:from-blue-600 hover:to-teal-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                className="w-full px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-900/20"
                             >
                                 Close
                             </button>

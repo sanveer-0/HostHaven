@@ -197,48 +197,49 @@ export default function RoomServicePage() {
 
     if (!roomNumber) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 flex items-center justify-center p-4">
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center max-w-md">
-                    <i className="fa-solid fa-exclamation-triangle text-6xl text-amber-500 mb-4"></i>
-                    <h1 className="text-2xl font-bold text-slate-800 mb-2">Invalid Access</h1>
-                    <p className="text-slate-600">Please scan the QR code in your room to access room service.</p>
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex items-center justify-center p-4 text-slate-100 relative overflow-hidden">
+                <div className="glass-dark rounded-2xl p-8 text-center max-w-md relative z-10">
+                    <i className="fa-solid fa-exclamation-triangle text-6xl text-amber-500 mb-4 animate-bounce"></i>
+                    <h1 className="text-2xl font-bold text-slate-100 mb-2">Invalid Access</h1>
+                    <p className="text-slate-300">Please scan the QR code in your room to access room service.</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-sky-100 via-cyan-50 to-blue-100 pb-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 pb-6 text-slate-100 relative overflow-x-hidden">
+
             {/* Header */}
-            <header className="bg-white/70 backdrop-blur-xl border-b border-white/60 p-4 md:p-6 sticky top-0 z-10">
+            <header className="glass-dark border-b border-white/5 p-4 md:p-6 sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 md:gap-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                                <i className="fa-solid fa-hotel text-lg md:text-xl text-white"></i>
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                <i className="fa-solid fa-bell-concierge text-lg md:text-xl text-white"></i>
                             </div>
                             <div>
-                                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                                     Room Service
                                 </h1>
-                                <p className="text-xs md:text-sm text-slate-600">Room {roomNumber}</p>
+                                <p className="text-xs md:text-sm text-slate-400">Room {roomNumber}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 md:gap-3">
                             <button
                                 onClick={() => setShowMyRequests(!showMyRequests)}
-                                className="px-3 py-2 md:px-4 md:py-2 bg-white/70 hover:bg-white text-slate-700 rounded-xl font-medium transition-all border border-slate-200 relative text-sm"
+                                className="px-3 py-2 md:px-4 md:py-2 glass-dark hover:bg-white/10 text-slate-200 rounded-xl font-medium transition-all border border-white/10 relative text-sm"
                             >
                                 <i className="fa-solid fa-clock-rotate-left md:mr-2"></i>
                                 <span className="hidden md:inline">My Requests</span>
                                 {myRequests.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                                    <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
                                         {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length}
                                     </span>
                                 )}
                             </button>
                             {(cart.length > 0 || selectedServices.length > 0) && (
-                                <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl font-semibold text-sm md:text-base">
+                                <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl font-semibold text-sm md:text-base shadow-lg shadow-cyan-500/30">
                                     ₹{calculateTotal()}
                                 </div>
                             )}
@@ -247,15 +248,15 @@ export default function RoomServicePage() {
                 </div>
             </header>
 
-            <div className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-6">
+            <div className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-6 relative z-10">
                 {/* My Requests Section */}
                 {showMyRequests && (
-                    <div className="mb-6 bg-white/70 backdrop-blur-sm rounded-2xl p-6">
+                    <div className="mb-6 glass-dark rounded-2xl p-6 border border-white/10 animate-scale-in">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-2xl font-bold text-slate-800">My Requests</h2>
+                            <h2 className="text-2xl font-bold text-slate-100">My Requests</h2>
                             <button
                                 onClick={() => setShowMyRequests(false)}
-                                className="text-slate-600 hover:text-slate-800"
+                                className="text-slate-400 hover:text-white"
                             >
                                 <i className="fa-solid fa-times text-xl"></i>
                             </button>
@@ -265,11 +266,11 @@ export default function RoomServicePage() {
                         ) : (
                             <div className="space-y-4">
                                 {myRequests.map((request: any) => (
-                                    <div key={request.id} className="bg-white rounded-xl p-4 border border-slate-200">
+                                    <div key={request.id} className="bg-slate-800/60 rounded-xl p-4 border border-white/5">
                                         <div className="flex items-start justify-between mb-2">
                                             <div>
-                                                <h3 className="font-semibold text-slate-800">{request.description}</h3>
-                                                <p className="text-sm text-slate-600">
+                                                <h3 className="font-semibold text-slate-200">{request.description}</h3>
+                                                <p className="text-sm text-slate-400">
                                                     {new Date(request.createdAt).toLocaleString('en-IN', {
                                                         day: '2-digit',
                                                         month: 'short',
@@ -278,10 +279,10 @@ export default function RoomServicePage() {
                                                     })}
                                                 </p>
                                             </div>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${request.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                                request.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                                                    request.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                                        'bg-red-100 text-red-700'
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${request.status === 'pending' ? 'bg-amber-500/20 text-amber-400' :
+                                                request.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
+                                                    request.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                                                        'bg-red-500/20 text-red-400'
                                                 }`}>
                                                 {request.status}
                                             </span>
@@ -289,20 +290,20 @@ export default function RoomServicePage() {
 
                                         {/* Items List */}
                                         {request.items && Array.isArray(request.items) && request.items.length > 0 && (
-                                            <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-                                                <p className="text-xs font-semibold text-slate-700 mb-2">
+                                            <div className="mt-3 p-3 bg-slate-900/50 rounded-lg">
+                                                <p className="text-xs font-semibold text-slate-400 mb-2">
                                                     <i className="fa-solid fa-list mr-1"></i>
                                                     Items Ordered:
                                                 </p>
                                                 <div className="space-y-1">
                                                     {request.items.map((item: any, index: number) => (
                                                         <div key={index} className="flex justify-between text-sm">
-                                                            <span className="text-slate-700">
+                                                            <span className="text-slate-300">
                                                                 {item.quantity && item.quantity > 1 ? `${item.quantity}x ` : ''}
                                                                 {item.name}
                                                             </span>
                                                             {item.price > 0 && (
-                                                                <span className="text-slate-600 font-medium">
+                                                                <span className="text-slate-400 font-medium">
                                                                     ₹{item.quantity ? item.price * item.quantity : item.price}
                                                                 </span>
                                                             )}
@@ -313,21 +314,21 @@ export default function RoomServicePage() {
                                         )}
 
                                         {request.totalAmount > 0 && (
-                                            <p className="text-sm font-semibold text-cyan-600 mt-2">Total: ₹{request.totalAmount}</p>
+                                            <p className="text-sm font-semibold text-cyan-400 mt-2">Total: ₹{request.totalAmount}</p>
                                         )}
                                         {request.specialInstructions && (
-                                            <p className="text-sm text-slate-600 mt-2">
+                                            <p className="text-sm text-slate-400 mt-2">
                                                 <i className="fa-solid fa-note-sticky mr-1"></i>
                                                 {request.specialInstructions}
                                             </p>
                                         )}
                                         {request.staffNotes && (
-                                            <div className="mt-2 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
-                                                <p className="text-xs font-semibold text-blue-700 mb-1">
+                                            <div className="mt-2 p-3 bg-blue-900/20 border-l-4 border-blue-500 rounded">
+                                                <p className="text-xs font-semibold text-blue-400 mb-1">
                                                     <i className="fa-solid fa-user-tie mr-1"></i>
                                                     Staff Notes:
                                                 </p>
-                                                <p className="text-sm text-blue-800">
+                                                <p className="text-sm text-blue-300">
                                                     {request.staffNotes}
                                                 </p>
                                             </div>
@@ -341,23 +342,24 @@ export default function RoomServicePage() {
 
                 {/* Room Service Items Section */}
                 <div className="mb-6 md:mb-8">
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4 flex items-center gap-2">
-                        <i className="fa-solid fa-bell-concierge text-teal-600"></i>
-                        Room Service
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-100 mb-3 md:mb-4 flex items-center gap-2 drop-shadow-md">
+                        <i className="fa-solid fa-concierge-bell text-teal-400"></i>
+                        Quick Services
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
                         {roomServiceItems.map(service => (
                             <button
                                 key={service.name}
                                 onClick={() => toggleService(service.name)}
-                                className={`p-3 md:p-4 rounded-xl text-center transition-all ${selectedServices.includes(service.name)
-                                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg scale-105'
-                                    : 'bg-white/70 hover:bg-white text-slate-800 hover:shadow-md'
+                                className={`group p-4 md:p-5 rounded-2xl text-center transition-all duration-300 border backdrop-blur-md relative overflow-hidden ${selectedServices.includes(service.name)
+                                    ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/40 border-cyan-400 scale-105'
+                                    : 'glass-card-dark text-slate-300 hover:text-white hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-900/20 cursor-pointer'
                                     }`}
                             >
-                                <i className={`fa-solid ${service.icon} text-2xl md:text-3xl mb-2`}></i>
+                                <div className={`absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 transition-opacity ${!selectedServices.includes(service.name) ? 'group-hover:opacity-100' : ''}`}></div>
+                                <i className={`fa-solid ${service.icon} text-2xl md:text-3xl mb-3 transition-transform ${selectedServices.includes(service.name) ? 'scale-110' : 'group-hover:scale-110'}`}></i>
                                 <h3 className="font-semibold text-xs md:text-sm mb-1 leading-tight">{service.name}</h3>
-                                <p className="text-xs opacity-90">
+                                <p className={`text-xs ${selectedServices.includes(service.name) ? 'text-cyan-100' : 'text-slate-500 group-hover:text-cyan-400'}`}>
                                     {service.price === 0 ? 'Free' : `₹${service.price}`}
                                 </p>
                             </button>
@@ -367,47 +369,52 @@ export default function RoomServicePage() {
 
                 {/* Food Menu Section */}
                 <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-3 md:mb-4 flex items-center gap-2">
-                        <i className="fa-solid fa-utensils text-cyan-600"></i>
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-100 mb-3 md:mb-4 flex items-center gap-2 drop-shadow-md">
+                        <i className="fa-solid fa-utensils text-cyan-400"></i>
                         Food Menu
                     </h2>
                     {loading ? (
                         <div className="text-center py-12">
                             <i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-500 mb-4"></i>
-                            <p className="text-slate-600">Loading menu...</p>
+                            <p className="text-slate-400">Loading menu...</p>
                         </div>
                     ) : (
-                        <div className="space-y-6 md:space-y-8">
+                        <div className="space-y-8 md:space-y-10">
                             {categories.map(category => {
                                 const items = menu.filter(item => item.category === category && item.isAvailable);
                                 if (items.length === 0) return null;
 
                                 return (
                                     <div key={category}>
-                                        <h3 className="text-lg md:text-xl font-bold text-slate-700 mb-3 capitalize">{category}</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                                        <h3 className="text-lg md:text-xl font-bold text-teal-300 mb-4 capitalize px-2 border-l-4 border-teal-500">{category}</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
                                             {items.map(item => (
-                                                <div key={item.id} className="bg-white/70 backdrop-blur-sm rounded-xl p-4 hover:shadow-lg transition-all">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div className="flex-1 pr-2">
-                                                            <h4 className="font-semibold text-slate-800 flex items-center gap-2 text-sm md:text-base">
+                                                <div
+                                                    key={item.id}
+                                                    className="glass-card-dark rounded-2xl p-5 hover:shadow-2xl hover:shadow-black/40 transition-all duration-300 group ring-1 ring-white/5 hover:ring-cyan-500/30"
+                                                >
+                                                    <div className="flex justify-between items-start mb-3">
+                                                        <div className="flex-1 pr-3">
+                                                            <h4 className="font-bold text-slate-100 flex items-center gap-2 text-base md:text-lg group-hover:text-cyan-300 transition-colors">
                                                                 {item.name}
                                                                 {item.isVegetarian && (
-                                                                    <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-green-600 flex items-center justify-center flex-shrink-0">
-                                                                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-600 rounded-full"></span>
+                                                                    <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-green-500 flex items-center justify-center flex-shrink-0 rounded-sm" title="Vegetarian">
+                                                                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></span>
                                                                     </span>
                                                                 )}
                                                             </h4>
-                                                            <p className="text-xs md:text-sm text-slate-600 line-clamp-2">{item.description}</p>
+                                                            <p className="text-xs md:text-sm text-slate-400 line-clamp-2 mt-1">{item.description}</p>
                                                         </div>
-                                                        <span className="text-base md:text-lg font-bold text-cyan-600 flex-shrink-0">₹{item.price}</span>
+                                                        <span className="text-base md:text-xl font-bold text-teal-400 flex-shrink-0 drop-shadow-sm">₹{item.price}</span>
                                                     </div>
                                                     <button
                                                         onClick={() => addToCart(item)}
-                                                        className="w-full mt-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg font-medium transition-all text-sm md:text-base"
+                                                        className="w-full mt-3 px-4 py-2.5 bg-slate-800 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-medium transition-all text-sm md:text-base border border-white/5 hover:border-transparent group-hover:shadow-lg shadow-black/20"
                                                     >
-                                                        <i className="fa-solid fa-plus mr-2"></i>
-                                                        Add to Cart
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <i className="fa-solid fa-plus"></i>
+                                                            Add to Order
+                                                        </div>
                                                     </button>
                                                 </div>
                                             ))}
@@ -421,33 +428,36 @@ export default function RoomServicePage() {
 
                 {/* Cart */}
                 {cart.length > 0 && (
-                    <div className="mt-6 md:mt-8 bg-white/70 backdrop-blur-sm rounded-xl p-4 md:p-6">
-                        <h3 className="text-lg md:text-xl font-bold text-slate-800 mb-4">Your Food Order</h3>
-                        <div className="space-y-3">
+                    <div className="mt-8 md:mt-10 glass-dark rounded-2xl p-5 md:p-6 border border-teal-500/20 shadow-xl shadow-teal-900/10">
+                        <h3 className="text-lg md:text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
+                            <i className="fa-solid fa-cart-shopping text-teal-400"></i>
+                            Your Order
+                        </h3>
+                        <div className="space-y-4">
                             {cart.map(item => (
-                                <div key={item.id} className="flex items-center justify-between gap-2">
+                                <div key={item.id} className="flex items-center justify-between gap-3 bg-slate-800/40 p-3 rounded-xl border border-white/5">
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-slate-800 text-sm md:text-base truncate">{item.name}</p>
-                                        <p className="text-xs md:text-sm text-slate-600">₹{item.price} each</p>
+                                        <p className="font-semibold text-slate-200 text-sm md:text-base truncate">{item.name}</p>
+                                        <p className="text-xs md:text-sm text-slate-400">₹{item.price} each</p>
                                     </div>
                                     <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                            className="w-7 h-7 md:w-8 md:h-8 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center justify-center"
+                                            className="w-8 h-8 md:w-9 md:h-9 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center text-white transition-colors"
                                         >
                                             <i className="fa-solid fa-minus text-xs"></i>
                                         </button>
-                                        <span className="w-6 md:w-8 text-center font-semibold text-sm md:text-base">{item.quantity}</span>
+                                        <span className="w-6 md:w-8 text-center font-bold text-slate-100 text-sm md:text-base">{item.quantity}</span>
                                         <button
                                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                            className="w-7 h-7 md:w-8 md:h-8 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg flex items-center justify-center"
+                                            className="w-8 h-8 md:w-9 md:h-9 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg flex items-center justify-center transition-colors shadow-lg shadow-cyan-900/20"
                                         >
                                             <i className="fa-solid fa-plus text-xs"></i>
                                         </button>
-                                        <span className="w-16 md:w-20 text-right font-bold text-cyan-600 text-sm md:text-base">₹{item.price * item.quantity}</span>
+                                        <span className="w-16 md:w-20 text-right font-bold text-teal-400 text-sm md:text-base">₹{item.price * item.quantity}</span>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
-                                            className="w-7 h-7 md:w-8 md:h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg flex items-center justify-center"
+                                            className="w-8 h-8 md:w-9 md:h-9 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors"
                                         >
                                             <i className="fa-solid fa-trash text-xs"></i>
                                         </button>
@@ -460,15 +470,15 @@ export default function RoomServicePage() {
 
                 {/* Special Instructions */}
                 {(cart.length > 0 || selectedServices.length > 0) && (
-                    <div className="mt-4 md:mt-6 bg-white/70 backdrop-blur-sm rounded-xl p-4 md:p-6">
-                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <div className="mt-4 md:mt-6 glass-dark rounded-2xl p-4 md:p-6 border border-white/5">
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
                             Special Instructions (Optional)
                         </label>
                         <textarea
                             value={specialInstructions}
                             onChange={(e) => setSpecialInstructions(e.target.value)}
                             placeholder="Any special requests or dietary requirements..."
-                            className="w-full px-3 py-2 md:px-4 md:py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm md:text-base"
+                            className="w-full px-3 py-2 md:px-4 md:py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100 placeholder-slate-500 text-sm md:text-base"
                             rows={3}
                         />
                     </div>
@@ -476,11 +486,11 @@ export default function RoomServicePage() {
 
                 {/* Submit Button */}
                 {(cart.length > 0 || selectedServices.length > 0) && (
-                    <div className="mt-4 md:mt-6 sticky bottom-0 bg-gradient-to-t from-sky-100 via-cyan-50 to-transparent pt-4 pb-2 md:pb-0 md:static md:bg-none">
+                    <div className="mt-4 md:mt-6 sticky bottom-0 bg-gradient-to-t from-slate-900 via-slate-900/90 to-transparent pt-6 pb-4 md:pb-0 md:static md:bg-none z-40">
                         <button
                             onClick={handleSubmit}
                             disabled={submitting}
-                            className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-slate-400 disabled:to-slate-500 text-white font-bold rounded-xl shadow-lg transition-all text-base md:text-lg"
+                            className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-800 text-white font-bold rounded-xl shadow-lg shadow-cyan-900/40 transition-all text-base md:text-lg border border-white/10"
                         >
                             {submitting ? (
                                 <>

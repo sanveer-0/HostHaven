@@ -105,15 +105,15 @@ export default function RequestsPage() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'pending':
-                return 'bg-amber-100 text-amber-700 border-amber-300';
+                return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
             case 'in-progress':
-                return 'bg-blue-100 text-blue-700 border-blue-300';
+                return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
             case 'completed':
-                return 'bg-green-100 text-green-700 border-green-300';
+                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
             case 'cancelled':
-                return 'bg-red-100 text-red-700 border-red-300';
+                return 'bg-red-500/20 text-red-400 border-red-500/30';
             default:
-                return 'bg-slate-100 text-slate-700 border-slate-300';
+                return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
         }
     };
 
@@ -134,17 +134,15 @@ export default function RequestsPage() {
     return (
         <div className="flex flex-col h-screen">
             {/* Header */}
-            <header className="bg-white/70 backdrop-blur-xl border-b border-white/60 p-6">
+            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                            Service Requests
-                        </h1>
-                        <p className="text-slate-600 mt-1">Manage guest food orders and room service requests</p>
+                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">Service Requests</h2>
+                        <p className="text-slate-300">Manage guest food orders and room service requests</p>
                     </div>
                     <button
                         onClick={loadRequests}
-                        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-medium transition-all shadow-lg"
+                        className="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-cyan-900/20 border border-white/10"
                     >
                         <i className="fa-solid fa-rotate mr-2"></i>
                         Refresh
@@ -154,11 +152,11 @@ export default function RequestsPage() {
                 {/* Filters */}
                 <div className="flex gap-4 mt-6">
                     <div className="flex-1">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Filter by Status</label>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Status</label>
                         <select
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500"
                         >
                             <option value="all">All Statuses</option>
                             <option value="pending">Pending</option>
@@ -168,11 +166,11 @@ export default function RequestsPage() {
                         </select>
                     </div>
                     <div className="flex-1">
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Filter by Type</label>
+                        <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Type</label>
                         <select
                             value={filterType}
                             onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500"
                         >
                             <option value="all">All Types</option>
                             <option value="food">Food Orders</option>
@@ -183,18 +181,18 @@ export default function RequestsPage() {
             </header>
 
             {/* Requests List */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-8">
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
-                            <i className="fa-solid fa-spinner fa-spin text-4xl text-purple-500 mb-4"></i>
-                            <p className="text-slate-600">Loading requests...</p>
+                            <i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-500 mb-4"></i>
+                            <p className="text-slate-400">Loading requests...</p>
                         </div>
                     </div>
                 ) : filteredRequests.length === 0 ? (
-                    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-12 text-center">
-                        <i className="fa-solid fa-inbox text-6xl text-slate-300 mb-4"></i>
-                        <h2 className="text-2xl font-bold text-slate-700 mb-2">No Requests Found</h2>
+                    <div className="glass-card-dark rounded-2xl p-12 text-center border border-white/5">
+                        <i className="fa-solid fa-inbox text-6xl text-slate-600 mb-4"></i>
+                        <h2 className="text-2xl font-bold text-slate-300 mb-2">No Requests Found</h2>
                         <p className="text-slate-500">
                             {filterStatus !== 'all' || filterType !== 'all'
                                 ? 'Try adjusting your filters'
@@ -206,20 +204,20 @@ export default function RequestsPage() {
                         {filteredRequests.map((request) => (
                             <div
                                 key={request.id}
-                                className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 hover:shadow-xl transition-all border border-white/60"
+                                className="glass-card-dark rounded-2xl p-6 hover:shadow-xl transition-all border border-white/5 group"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${request.type === 'food'
-                                            ? 'from-orange-500 to-red-500'
-                                            : 'from-teal-500 to-cyan-500'
-                                            } flex items-center justify-center shadow-lg`}>
-                                            <i className={`fa-solid ${getTypeIcon(request.type)} text-white text-lg`}></i>
+                                            ? 'from-orange-500 to-red-600'
+                                            : 'from-teal-500 to-cyan-600'
+                                            } flex items-center justify-center shadow-lg shadow-black/20 text-white`}>
+                                            <i className={`fa-solid ${getTypeIcon(request.type)} text-lg`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-800">Room {request.roomId}</h3>
-                                            <p className="text-xs text-slate-600">{formatDate(request.createdAt)}</p>
+                                            <h3 className="font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">Room {request.roomId}</h3>
+                                            <p className="text-xs text-slate-400">{formatDate(request.createdAt)}</p>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase border ${getStatusColor(request.status)}`}>
@@ -229,20 +227,20 @@ export default function RequestsPage() {
 
                                 {/* Description */}
                                 <div className="mb-4">
-                                    <p className="text-sm font-medium text-slate-700 mb-2">{request.description}</p>
+                                    <p className="text-sm font-medium text-slate-300 mb-2">{request.description}</p>
                                     {request.type === 'food' && Array.isArray(request.items) && (
-                                        <div className="bg-slate-50 rounded-lg p-3 space-y-1">
+                                        <div className="bg-slate-800/50 rounded-lg p-3 space-y-1 border border-white/5">
                                             {request.items.map((item: any, idx: number) => (
                                                 <div key={idx} className="flex justify-between text-sm">
-                                                    <span className="text-slate-700">{item.name} x{item.quantity}</span>
-                                                    <span className="font-semibold text-slate-800">₹{item.price * item.quantity}</span>
+                                                    <span className="text-slate-400">{item.name} x{item.quantity}</span>
+                                                    <span className="font-semibold text-slate-200">₹{item.price * item.quantity}</span>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
                                     {request.type === 'room_service' && Array.isArray(request.items) && (
-                                        <div className="bg-slate-50 rounded-lg p-3">
-                                            <ul className="text-sm text-slate-700 space-y-1">
+                                        <div className="bg-slate-800/50 rounded-lg p-3 border border-white/5">
+                                            <ul className="text-sm text-slate-300 space-y-1">
                                                 {request.items.map((item: any, idx: number) => (
                                                     <li key={idx}>• {item.name}</li>
                                                 ))}
@@ -250,8 +248,8 @@ export default function RequestsPage() {
                                         </div>
                                     )}
                                     {request.specialInstructions && (
-                                        <div className="mt-2 p-2 bg-blue-50 rounded-lg">
-                                            <p className="text-xs text-blue-700">
+                                        <div className="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                            <p className="text-xs text-blue-300">
                                                 <i className="fa-solid fa-note-sticky mr-1"></i>
                                                 {request.specialInstructions}
                                             </p>
@@ -261,28 +259,26 @@ export default function RequestsPage() {
 
                                 {/* Amount */}
                                 {request.totalAmount > 0 && (
-                                    <div className="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm font-medium text-slate-700">Total Amount</span>
-                                            <span className="text-lg font-bold text-purple-600">₹{request.totalAmount}</span>
-                                        </div>
+                                    <div className="mb-4 p-3 bg-gradient-to-r from-slate-800 to-slate-800/50 border border-white/5 rounded-lg flex justify-between items-center">
+                                        <span className="text-sm font-medium text-slate-400">Total Amount</span>
+                                        <span className="text-lg font-bold text-cyan-400">₹{request.totalAmount}</span>
                                     </div>
                                 )}
 
                                 {/* Notes */}
                                 {request.notes && (
-                                    <div className="mb-4 p-3 bg-slate-50 rounded-lg">
-                                        <p className="text-xs font-semibold text-slate-600 mb-1">Staff Notes:</p>
-                                        <p className="text-sm text-slate-700">{request.notes}</p>
+                                    <div className="mb-4 p-3 bg-slate-800/50 rounded-lg border border-white/5">
+                                        <p className="text-xs font-semibold text-slate-500 mb-1">Staff Notes:</p>
+                                        <p className="text-sm text-slate-300">{request.notes}</p>
                                     </div>
                                 )}
 
                                 {/* Actions */}
-                                <div className="space-y-2">
+                                <div className="space-y-2 pt-2 border-t border-white/5">
                                     {request.status === 'pending' && (
                                         <button
                                             onClick={() => updateStatus(request.id, 'in-progress')}
-                                            className="w-full px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-all"
+                                            className="w-full px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-lg font-medium transition-all"
                                         >
                                             <i className="fa-solid fa-play mr-2"></i>
                                             Start Processing
@@ -291,7 +287,7 @@ export default function RequestsPage() {
                                     {request.status === 'in-progress' && (
                                         <button
                                             onClick={() => updateStatus(request.id, 'completed')}
-                                            className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg font-medium transition-all"
+                                            className="w-full px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg font-medium transition-all"
                                         >
                                             <i className="fa-solid fa-check mr-2"></i>
                                             Mark as Completed
@@ -304,7 +300,7 @@ export default function RequestsPage() {
                                                 setNotes(request.notes || '');
                                                 setShowNotesModal(true);
                                             }}
-                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-all text-sm"
+                                            className="px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-slate-300 rounded-lg font-medium transition-all text-sm border border-white/5"
                                         >
                                             <i className="fa-solid fa-note-sticky mr-2"></i>
                                             Notes
@@ -312,7 +308,7 @@ export default function RequestsPage() {
                                         {request.status !== 'cancelled' && request.status !== 'completed' && (
                                             <button
                                                 onClick={() => updateStatus(request.id, 'cancelled')}
-                                                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium transition-all text-sm"
+                                                className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 rounded-lg font-medium transition-all text-sm"
                                             >
                                                 <i className="fa-solid fa-times mr-2"></i>
                                                 Cancel
@@ -328,47 +324,47 @@ export default function RequestsPage() {
 
             {/* Notes Modal */}
             {showNotesModal && selectedRequest && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-slate-800">Add Notes</h3>
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-md w-full p-6 border border-white/10 animate-scale-in">
+                        <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
+                            <h3 className="text-xl font-bold text-slate-100">Add Notes</h3>
                             <button
                                 onClick={() => {
                                     setShowNotesModal(false);
                                     setNotes('');
                                     setSelectedRequest(null);
                                 }}
-                                className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center"
+                                className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors"
                             >
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
-                        <p className="text-sm text-slate-600 mb-4">
+                        <p className="text-sm text-slate-400 mb-4">
                             Room {selectedRequest.roomId} - {selectedRequest.description}
                         </p>
                         <textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Add notes or comments about this request..."
-                            className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-4"
+                            className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500 focus:outline-none mb-6 placeholder-slate-600"
                             rows={4}
                         />
                         <div className="flex gap-3">
-                            <button
-                                onClick={addNotes}
-                                className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all"
-                            >
-                                Save Notes
-                            </button>
                             <button
                                 onClick={() => {
                                     setShowNotesModal(false);
                                     setNotes('');
                                     setSelectedRequest(null);
                                 }}
-                                className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all"
+                                className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
                             >
                                 Cancel
+                            </button>
+                            <button
+                                onClick={addNotes}
+                                className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-900/20"
+                            >
+                                Save Notes
                             </button>
                         </div>
                     </div>

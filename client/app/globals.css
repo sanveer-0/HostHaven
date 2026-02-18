@@ -69,4 +69,138 @@
   .status-secondary {
     @apply bg-slate-500/20 text-slate-400 border border-slate-500/30;
   }
+
+  /* Dark Theme Utilities */
+  .glass-dark {
+    background: rgba(30, 41, 59, 0.7);
+    /* slate-800 */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-card-dark {
+    position: relative;
+    /* Dirty Glass Effect: Noise texture + Gradient */
+    background-color: rgba(30, 41, 59, 0.6);
+    background-image:
+      linear-gradient(135deg, rgba(51, 65, 85, 0.4) 0%, rgba(30, 41, 59, 0.6) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+
+    backdrop-filter: blur(20px) contrast(85%) brightness(90%);
+    /* Slightly dimmed/processed look */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  /* The glowing border effect */
+  .glass-card-dark::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg,
+        transparent 0%,
+        rgba(6, 182, 212, 0) 30%,
+        rgba(6, 182, 212, 0.8) 50%,
+        rgba(6, 182, 212, 0) 70%,
+        transparent 100%);
+    background-size: 200% 200%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: border-flow 4s linear infinite;
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.3s ease;
+  }
+
+  /* Show glow on hover */
+  .glass-card-dark:hover::before {
+    opacity: 1;
+  }
+
+  /* Inner content background to sit on top of the border glow */
+  .glass-card-dark::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    /* Leave 1px gap for border */
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .glass-card-dark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6), 0 0 15px rgba(34, 211, 238, 0.15);
+    border-color: transparent;
+    /* Let the gradient show through */
+  }
+
+  @keyframes border-flow {
+    0% {
+      background-position: 0% 0%;
+    }
+
+    50% {
+      background-position: 100% 100%;
+    }
+
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.05) 20%,
+        rgba(255, 255, 255, 0.1) 60%,
+        rgba(255, 255, 255, 0));
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-sway-slow {
+    animation: sway 8s ease-in-out infinite alternate;
+  }
+
+  .animate-sway-slower {
+    animation: sway 12s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes sway {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(5deg);
+    }
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
 }

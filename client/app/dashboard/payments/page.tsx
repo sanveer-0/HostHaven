@@ -11,7 +11,7 @@ export default function PaymentsPage() {
     const [showModal, setShowModal] = useState(false);
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
     const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState('cash');
+    const [paymentMethod, setPaymentMethod] = useState<Payment['paymentMethod']>('cash');
     const [invoice, setInvoice] = useState<any>(null);
     const [loadingInvoice, setLoadingInvoice] = useState(false);
 
@@ -108,12 +108,6 @@ export default function PaymentsPage() {
             const pricePerNight = booking.room?.pricePerNight || 0;
             const roomCharges = nights * pricePerNight;
 
-            console.log('Nights:', nights);
-            console.log('Price per night:', pricePerNight);
-            console.log('Room charges:', roomCharges);
-            console.log('Service charges:', totalServiceCharges);
-            console.log('Payment amount:', payment.amount);
-
             // If room charges are 0, use payment amount minus service charges
             const finalRoomCharges = roomCharges > 0 ? roomCharges : (payment.amount - totalServiceCharges);
 
@@ -150,7 +144,6 @@ export default function PaymentsPage() {
                 paymentStatus: payment.status
             };
 
-            console.log('Invoice data:', invoiceData);
             setInvoice(invoiceData);
             setShowInvoiceModal(true);
         } catch (error) {
@@ -178,64 +171,64 @@ export default function PaymentsPage() {
 
     return (
         <>
-            <header className="px-8 py-6 border-b border-white/60 bg-white/50 backdrop-blur-sm">
+            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-800 mb-1">Payment Records</h2>
-                        <p className="text-slate-600">Track all financial transactions 💳 Click on pending payments to complete them</p>
+                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">Payment Records</h2>
+                        <p className="text-slate-300">Track all financial transactions 💳 Click on pending payments to complete them</p>
                     </div>
                 </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-8">
-                <div className="bg-white/70 backdrop-blur-sm border border-white/60 rounded-2xl overflow-hidden shadow-lg animate-fade-in">
+                <div className="glass-card-dark rounded-2xl overflow-hidden shadow-lg animate-fade-in border border-white/5">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-slate-50/50">
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Booking Ref</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Amount</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Method</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                                <tr className="bg-slate-800/50 border-b border-white/5">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Booking Ref</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Method</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200">
+                            <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center">
-                                            <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-500 mb-3"></i>
-                                            <p className="text-slate-600">Loading payments...</p>
+                                            <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-400 mb-3"></i>
+                                            <p className="text-slate-400">Loading payments...</p>
                                         </td>
                                     </tr>
                                 ) : payments.length > 0 ? (
                                     payments.map((payment) => (
                                         <tr
                                             key={payment.id}
-                                            className="hover:bg-emerald-50/30 transition-colors group"
+                                            className="hover:bg-white/5 transition-colors group"
                                         >
-                                            <td className="px-6 py-4 text-slate-700">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-slate-300">{new Date(payment.paymentDate).toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-mono">
+                                                <span className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-white/10">
                                                     #{payment.bookingId}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-emerald-600 font-bold text-lg">₹{payment.amount}</span>
+                                                <span className="text-emerald-400 font-bold text-lg">₹{payment.amount}</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                                                        <i className={`fa-solid ${getPaymentMethodIcon(payment.paymentMethod)} text-slate-600 text-sm`}></i>
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+                                                        <i className={`fa-solid ${getPaymentMethodIcon(payment.paymentMethod)} text-slate-400 text-sm`}></i>
                                                     </div>
-                                                    <span className="text-slate-700 capitalize">{payment.paymentMethod === 'pending' ? 'Not Set' : payment.paymentMethod.replace('_', ' ')}</span>
+                                                    <span className="text-slate-300 capitalize">{payment.paymentMethod === 'pending' ? 'Not Set' : payment.paymentMethod.replace('_', ' ')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${payment.status === 'pending'
-                                                    ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
-                                                    : 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                                                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                                                     }`}>{payment.status}</span>
                                             </td>
                                             <td className="px-6 py-4">
@@ -246,7 +239,7 @@ export default function PaymentsPage() {
                                                                 e.stopPropagation();
                                                                 handlePaymentClick(payment);
                                                             }}
-                                                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-xs font-semibold rounded-lg transition-all shadow-md"
+                                                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold rounded-lg transition-all shadow-md border border-white/10 flex items-center gap-1"
                                                         >
                                                             <i className="fa-solid fa-check mr-1"></i>
                                                             Complete
@@ -258,7 +251,7 @@ export default function PaymentsPage() {
                                                             handleViewInvoice(payment);
                                                         }}
                                                         disabled={loadingInvoice}
-                                                        className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-xs font-semibold rounded-lg transition-all shadow-md disabled:opacity-50"
+                                                        className="px-3 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-semibold rounded-lg transition-all shadow-md disabled:opacity-50 border border-white/10 flex items-center gap-1"
                                                     >
                                                         <i className="fa-solid fa-file-invoice mr-1"></i>
                                                         View Invoice
@@ -270,8 +263,8 @@ export default function PaymentsPage() {
                                 ) : (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-12 text-center">
-                                            <i className="fa-solid fa-receipt text-4xl text-slate-300 mb-3"></i>
-                                            <p className="text-slate-500">No payments found</p>
+                                            <i className="fa-solid fa-receipt text-4xl text-slate-600 mb-3"></i>
+                                            <p className="text-slate-400">No payments found</p>
                                         </td>
                                     </tr>
                                 )}
@@ -283,48 +276,48 @@ export default function PaymentsPage() {
 
             {/* Complete Payment Modal */}
             {showModal && selectedPayment && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-slate-800">Complete Payment</h3>
-                            <button onClick={() => { setShowModal(false); setSelectedPayment(null); }} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in border border-white/10">
+                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+                            <h3 className="text-2xl font-bold text-slate-100">Complete Payment</h3>
+                            <button onClick={() => { setShowModal(false); setSelectedPayment(null); }} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors">
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
                         <div className="space-y-4">
-                            <div className="bg-blue-50 p-4 rounded-xl">
-                                <p className="text-sm text-slate-600 mb-1">Booking Reference</p>
-                                <p className="text-lg font-bold text-slate-800">#{selectedPayment.bookingId}</p>
+                            <div className="bg-blue-900/20 p-4 rounded-xl border border-blue-500/20">
+                                <p className="text-sm text-blue-300 mb-1">Booking Reference</p>
+                                <p className="text-lg font-bold text-blue-100">#{selectedPayment.bookingId}</p>
                             </div>
-                            <div className="bg-emerald-50 p-4 rounded-xl">
-                                <p className="text-sm text-slate-600 mb-1">Amount to Pay</p>
-                                <p className="text-2xl font-bold text-emerald-600">₹{selectedPayment.amount}</p>
+                            <div className="bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/20">
+                                <p className="text-sm text-emerald-300 mb-1">Amount to Pay</p>
+                                <p className="text-2xl font-bold text-emerald-400">₹{selectedPayment.amount}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Payment Method</label>
+                                <label className="block text-sm font-semibold text-slate-400 mb-2">Payment Method</label>
                                 <select
                                     value={paymentMethod}
-                                    onChange={(e) => setPaymentMethod(e.target.value)}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-200"
+                                    onChange={(e) => setPaymentMethod(e.target.value as Payment['paymentMethod'])}
+                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
                                 >
-                                    <option value="cash">Cash</option>
-                                    <option value="card">Credit/Debit Card</option>
-                                    <option value="upi">UPI</option>
-                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="cash" className="bg-slate-800">Cash</option>
+                                    <option value="card" className="bg-slate-800">Credit/Debit Card</option>
+                                    <option value="upi" className="bg-slate-800">UPI</option>
+                                    <option value="bank_transfer" className="bg-slate-800">Bank Transfer</option>
                                 </select>
                             </div>
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex gap-3 pt-4 border-t border-white/10">
                                 <button
                                     type="button"
                                     onClick={() => { setShowModal(false); setSelectedPayment(null); }}
-                                    className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-all"
+                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleCompletePayment}
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-900/20"
                                 >
                                     Complete Payment
                                 </button>
