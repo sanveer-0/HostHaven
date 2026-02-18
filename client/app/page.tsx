@@ -148,8 +148,8 @@ export default function LoginPage() {
               <div className="text-xs text-cyan-200/80">
                 <p className="font-semibold mb-2 text-cyan-100">Demo Credentials:</p>
                 <div className="space-y-1 font-mono">
-                  <p>Email: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">admin@test.com</span></p>
-                  <p>Password: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">password123</span></p>
+                  <p>Email: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">admin@hosthaven.com</span></p>
+                  <p>Password: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">admin123</span></p>
                 </div>
               </div>
             </div>
