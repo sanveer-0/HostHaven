@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface MenuItem {
@@ -17,7 +17,7 @@ interface CartItem extends MenuItem {
     quantity: number;
 }
 
-export default function RoomServicePage() {
+function RoomServiceContent() {
     const searchParams = useSearchParams();
     const roomNumber = searchParams.get('room');
 
@@ -508,5 +508,13 @@ export default function RoomServicePage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function RoomServicePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center"><i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-500"></i></div>}>
+            <RoomServiceContent />
+        </Suspense>
     );
 }
