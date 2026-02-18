@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getUser, clearAuth } from '@/lib/auth';
 import { User } from '@/lib/api';
-import { TropicalGraphics } from '@/components/TropicalGraphics';
+
 
 export default function DashboardLayout({
     children,
