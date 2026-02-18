@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { bookingsAPI, roomsAPI, Booking, Room } from '@/lib/api';
 import InvoiceModal from '@/components/InvoiceModal';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hosthaven-backend.onrender.com/api';
+
 export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [rooms, setRooms] = useState<Room[]>([]);
@@ -119,7 +121,7 @@ export default function BookingsPage() {
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             // First create the primary guest
-            const guestResponse = await fetch('http://localhost:5000/api/guests', {
+            const guestResponse = await fetch(`${API_URL}/guests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
