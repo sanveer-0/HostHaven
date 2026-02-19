@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authAPI } from '@/lib/api';
+import { authAPI, API_URL } from '@/lib/api';
 import { setAuth } from '@/lib/auth';
 
 export default function LoginPage() {
@@ -167,6 +167,11 @@ export default function LoginPage() {
         {/* Bottom text */}
         <p className="text-center mt-6 text-sm text-slate-500">
           © 2026 HostHaven. Making waves in hospitality 🌊
+        </p>
+
+        {/* Debug Info */}
+        <p className="text-center mt-2 text-xs text-slate-600 font-mono">
+          Connecting to: {API_URL}
         </p>
       </div>
     </div>

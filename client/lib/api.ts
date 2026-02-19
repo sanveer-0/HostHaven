@@ -75,7 +75,9 @@ export interface DashboardStats {
 
 // API Client
 // NEXT_PUBLIC_API_URL must be set at build time on Vercel for it to be baked into the bundle
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hosthaven-backend.onrender.com/api';
+export const API_URL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000/api'
+    : (process.env.NEXT_PUBLIC_API_URL || 'https://hosthaven-backend.onrender.com/api');
 
 class APIError extends Error {
     constructor(public status: number, message: string) {
