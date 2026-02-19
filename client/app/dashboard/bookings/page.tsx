@@ -338,7 +338,7 @@ export default function BookingsPage() {
                                             <input
                                                 type="date"
                                                 value={formData.checkInDate}
-                                                min={new Date().toISOString().split('T')[0]}
+                                                min={new Date().toLocaleDateString('en-CA')}
                                                 onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value, checkOutDate: '' })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
@@ -350,8 +350,8 @@ export default function BookingsPage() {
                                                 type="date"
                                                 value={formData.checkOutDate}
                                                 min={formData.checkInDate
-                                                    ? new Date(new Date(formData.checkInDate).getTime() + 86400000).toISOString().split('T')[0]
-                                                    : new Date().toISOString().split('T')[0]}
+                                                    ? new Date(new Date(formData.checkInDate).getTime() + 86400000).toLocaleDateString('en-CA')
+                                                    : new Date().toLocaleDateString('en-CA')}
                                                 onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
