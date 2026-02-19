@@ -19,7 +19,7 @@ const getBookings = async (req, res) => {
                     attributes: ['roomNumber', 'type', 'pricePerNight']
                 }
             ],
-            order: [['checkInDate', 'DESC']]
+            order: [['createdAt', 'DESC']]
         });
         res.json(bookings);
     } catch (error) {
@@ -55,6 +55,11 @@ const createBooking = async (req, res) => {
     try {
         const { roomId, checkInDate, checkOutDate } = req.body;
 
+        // Validate dates
+        if (new Date(checkOutDate) <= new Date(checkInDate)) {
+            return res.status(400).json({ message: 'Check-out date must be after check-in date' });
+        }
+
         // Check if room is available
         const roomData = await Room.findByPk(roomId);
         if (!roomData) {
@@ -65,6 +70,7 @@ const createBooking = async (req, res) => {
         }
 
         // Create booking
+        console.log('Creating booking with secondaryGuests:', JSON.stringify(req.body.secondaryGuests));
         const booking = await Booking.create(req.body);
 
         // Update room status
@@ -192,7 +198,14 @@ const getBookingsByRoom = async (req, res) => {
             ],
             order: [['checkInDate', 'DESC']]
         });
-        console.log('Found bookings:', bookings.length);
+
+        // Debug log to check if secondaryGuests is present
+        if (bookings.length > 0) {
+            console.log('Sample booking secondaryGuests:', JSON.stringify(bookings[0].secondaryGuests));
+        } else {
+            console.log('No bookings found for this room.');
+        }
+
         res.json(bookings);
     } catch (error) {
         console.error('Error in getBookingsByRoom:', error);
@@ -225,14 +238,21 @@ const checkoutBooking = async (req, res) => {
         // Calculate stay duration and room charges
         const checkIn = new Date(booking.checkInDate);
         const checkOut = new Date();
-        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-        const roomCharges = nights * parseFloat(booking.room.pricePerNight);
+        // Calculate nights, forcing at least 1 night charge even for same-day checkout
+        const diffDays = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const nights = Math.max(1, diffDays);
 
-        // Get all service requests for this booking
+        const pricePerNight = parseFloat(booking.room.pricePerNight) || 0;
+        const roomCharges = nights * pricePerNight;
+
+        console.log(`Checkout calculation: CheckIn=${checkIn.toISOString()}, CheckOut=${checkOut.toISOString()}, Nights=${nights} (diff=${diffDays}), Price=${pricePerNight}, RoomCharges=${roomCharges}`);
+
+        // Get all service requests for this booking only (not past guests)
         const serviceRequests = await ServiceRequest.findAll({
             where: {
+                bookingId: booking.id,
                 roomId: booking.roomId,
-                status: 'completed' // Only include completed requests
+                status: 'completed'
             }
         });
 
@@ -300,21 +320,39 @@ const checkoutBooking = async (req, res) => {
                     description: `Room ${booking.room.roomNumber} - ${nights} night(s) @ ₹${booking.room.pricePerNight}/night`,
                     amount: roomCharges
                 },
-                serviceCharges: serviceRequests.map(req => ({
-                    description: req.description,
-                    items: req.items,
-                    amount: parseFloat(req.totalAmount || 0),
-                    date: req.createdAt
-                })),
+                serviceCharges: serviceRequests.flatMap(req => {
+                    const reqItems = Array.isArray(req.items) ? req.items : [];
+                    // Each item in the request becomes its own invoice line
+                    return reqItems.length > 0
+                        ? reqItems.map(item => ({
+                            description: item.name,
+                            quantity: item.quantity,
+                            unitPrice: item.price,
+                            amount: parseFloat(item.price || 0) * parseInt(item.quantity || 1),
+                            date: req.createdAt
+                        }))
+                        : [{
+                            description: req.description || 'Room Service',
+                            quantity: 1,
+                            unitPrice: parseFloat(req.totalAmount || 0),
+                            amount: parseFloat(req.totalAmount || 0),
+                            date: req.createdAt
+                        }];
+                }),
                 totalServiceCharges: serviceCharges
             },
             totalAmount: totalAmount
         };
 
+        // Store invoice snapshot in payment record so it can be retrieved later
+        await payment.update({ notes: JSON.stringify(invoice) });
+
         res.json({
             message: 'Checkout successful',
             invoice
         });
+        console.log(`🧹 Wiped service requests for room ${booking.room.roomNumber} after checkout`);
+
     } catch (error) {
         console.error('Error in checkoutBooking:', error);
         res.status(500).json({ message: error.message });

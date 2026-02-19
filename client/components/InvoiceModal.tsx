@@ -257,28 +257,59 @@ export default function InvoiceModal({ invoice, onClose }: InvoiceModalProps) {
                                                     <p className="font-semibold text-slate-700">Service Charges</p>
                                                 </td>
                                             </tr>
-                                            {invoice.charges.serviceCharges.map((service: any, index: number) => (
-                                                <tr key={index} className="bg-white">
-                                                    <td className="py-2 px-4 pl-8">
-                                                        <p className="text-sm text-slate-700">{service.description}</p>
-                                                        {service.items && service.items.length > 0 && (
-                                                            <div className="mt-1 ml-3 space-y-0.5">
-                                                                {service.items.map((item: any, idx: number) => (
-                                                                    <p key={idx} className="text-xs text-slate-500">
-                                                                        • {item.name} x{item.quantity} @ ₹{item.price}
-                                                                    </p>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                        <p className="text-xs text-slate-500 mt-1">
-                                                            {new Date(service.date).toLocaleDateString()}
-                                                        </p>
-                                                    </td>
-                                                    <td className="py-2 px-4 text-right text-sm text-slate-700">
-                                                        ₹{service.amount.toFixed(2)}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                            {invoice.charges.serviceCharges.map((service: any, index: number) => {
+                                                const amount = Number(service.amount || 0);
+                                                // New flat format: {description, quantity, unitPrice, amount}
+                                                if (service.quantity !== undefined) {
+                                                    return (
+                                                        <tr key={index} className="bg-white">
+                                                            <td className="py-2 px-4 pl-8">
+                                                                <p className="text-sm text-slate-700">
+                                                                    {service.description}
+                                                                    {service.quantity > 1 && (
+                                                                        <span className="text-slate-500 ml-2">× {service.quantity} @ ₹{Number(service.unitPrice).toFixed(2)}</span>
+                                                                    )}
+                                                                </p>
+                                                                <p className="text-xs text-slate-400 mt-0.5">
+                                                                    {new Date(service.date).toLocaleDateString()}
+                                                                </p>
+                                                            </td>
+                                                            <td className="py-2 px-4 text-right text-sm text-slate-700">
+                                                                ₹{amount.toFixed(2)}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                                // Legacy grouped format: {description, items[], amount}
+                                                let items: any[] = [];
+                                                try {
+                                                    items = typeof service.items === 'string'
+                                                        ? JSON.parse(service.items)
+                                                        : (Array.isArray(service.items) ? service.items : []);
+                                                } catch (_) { items = []; }
+                                                return (
+                                                    <tr key={index} className="bg-white">
+                                                        <td className="py-2 px-4 pl-8">
+                                                            <p className="text-sm text-slate-700">{service.description}</p>
+                                                            {items.length > 0 && (
+                                                                <div className="mt-1 ml-3 space-y-0.5">
+                                                                    {items.map((item: any, idx: number) => (
+                                                                        <p key={idx} className="text-xs text-slate-500">
+                                                                            • {item.name} × {item.quantity} @ ₹{item.price}
+                                                                        </p>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                            <p className="text-xs text-slate-400 mt-1">
+                                                                {new Date(service.date).toLocaleDateString()}
+                                                            </p>
+                                                        </td>
+                                                        <td className="py-2 px-4 text-right text-sm text-slate-700">
+                                                            ₹{amount.toFixed(2)}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                             <tr className="bg-slate-50">
                                                 <td className="py-2 px-4 pl-8 font-semibold text-slate-700">
                                                     Total Service Charges

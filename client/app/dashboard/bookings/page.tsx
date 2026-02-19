@@ -42,7 +42,7 @@ export default function BookingsPage() {
                 bookingsAPI.getAll(),
                 roomsAPI.getAll(),
             ]);
-            setBookings(bookingsData);
+            setBookings(bookingsData.sort((a: Booking, b: Booking) => b.id - a.id));
             setRooms(roomsData.filter((r: Room) => r.status === 'available'));
         } catch (err) {
             console.error(err);
@@ -153,7 +153,8 @@ export default function BookingsPage() {
                 numberOfGuests: formData.numberOfGuests,
                 totalAmount: totalAmount,
                 bookingStatus: formData.bookingStatus as any,
-            });
+                secondaryGuests: formData.secondaryGuests,
+            } as any);
 
             setShowModal(false);
             setFormData({
@@ -337,7 +338,8 @@ export default function BookingsPage() {
                                             <input
                                                 type="date"
                                                 value={formData.checkInDate}
-                                                onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
+                                                min={new Date().toISOString().split('T')[0]}
+                                                onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value, checkOutDate: '' })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
                                             />
@@ -347,6 +349,9 @@ export default function BookingsPage() {
                                             <input
                                                 type="date"
                                                 value={formData.checkOutDate}
+                                                min={formData.checkInDate
+                                                    ? new Date(new Date(formData.checkInDate).getTime() + 86400000).toISOString().split('T')[0]
+                                                    : new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
@@ -570,6 +575,29 @@ export default function BookingsPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Secondary Guests */}
+                            {selectedBooking.secondaryGuests && selectedBooking.secondaryGuests.length > 0 && (
+                                <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">
+                                    <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                        <i className="fa-solid fa-users text-purple-400"></i>
+                                        Additional Guests
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {selectedBooking.secondaryGuests.map((guest: any, index: number) => (
+                                            <div key={index} className="flex items-center gap-4 bg-slate-900/50 p-3 rounded-lg border border-white/5">
+                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
+                                                    {guest.name?.[0] || 'G'}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-200">{guest.name || 'Unknown'}</p>
+                                                    <p className="text-xs text-slate-400">Age: {guest.age || 'N/A'}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Room Information */}
                             <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">

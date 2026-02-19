@@ -82,6 +82,11 @@ const Booking = sequelize.define('Booking', {
     specialRequests: {
         type: DataTypes.TEXT,
         defaultValue: ''
+    },
+    secondaryGuests: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: []
     }
 }, {
     timestamps: true,
@@ -89,10 +94,8 @@ const Booking = sequelize.define('Booking', {
 });
 
 // Validate check-out date is after check-in date
-Booking.beforeSave(async (booking) => {
-    if (booking.checkOutDate <= booking.checkInDate) {
-        throw new Error('Check-out date must be after check-in date');
-    }
-});
+// This is enforced explicitly in createBooking, not here,
+// so that checkout (which overwrites checkOutDate with now) is never blocked.
 
 module.exports = Booking;
+

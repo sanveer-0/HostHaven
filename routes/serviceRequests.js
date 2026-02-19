@@ -5,7 +5,8 @@ const {
     getRequests,
     getRequest,
     updateRequest,
-    deleteRequest
+    deleteRequest,
+    clearRoomRequests
 } = require('../controllers/serviceRequestController');
 const { protect } = require('../middleware/auth');
 
@@ -19,6 +20,7 @@ router.get('/room/:roomId', getRequests);
 router.get('/', protect, getRequests);
 router.get('/:id', protect, getRequest);
 router.put('/:id', protect, updateRequest);
+router.delete('/room/:roomId', protect, clearRoomRequests);
 router.delete('/:id', protect, deleteRequest);
 
 module.exports = router;

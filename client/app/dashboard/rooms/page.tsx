@@ -472,6 +472,33 @@ export default function RoomsPage() {
                                             </div>
                                         </div>
 
+                                        {/* Secondary Guests */}
+                                        {(() => {
+                                            let sg: any[] = [];
+                                            try {
+                                                const raw = (booking as any).secondaryGuests;
+                                                sg = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
+                                            } catch (_) { sg = []; }
+                                            return sg.length > 0 ? (
+                                                <div className="mb-4">
+                                                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-2">
+                                                        <i className="fa-solid fa-users mr-1"></i> Additional Guests
+                                                    </p>
+                                                    <div className="space-y-2">
+                                                        {sg.map((g: any, i: number) => (
+                                                            <div key={i} className="flex items-center gap-3 bg-white/5 px-3 py-2 rounded-lg">
+                                                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                                                                    {g.name?.[0] || '?'}
+                                                                </div>
+                                                                <span className="text-sm text-slate-200 font-medium">{g.name || 'Unknown'}</span>
+                                                                {g.age && <span className="text-xs text-slate-400 ml-auto">Age {g.age}</span>}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : null;
+                                        })()}
+
                                         <div className="border-t border-white/5 pt-4 mt-4">
                                             <div className="grid grid-cols-4 gap-3">
                                                 <div>

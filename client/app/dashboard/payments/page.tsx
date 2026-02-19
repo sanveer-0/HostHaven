@@ -67,84 +67,93 @@ export default function PaymentsPage() {
 
         setLoadingInvoice(true);
         try {
+            // Always rebuild from live data for accuracy
             const booking = payment.booking;
-
-            console.log('Payment data:', payment);
-            console.log('Booking data:', booking);
-            console.log('Room data:', booking.room);
-            console.log('Guest data:', booking.guest);
-
-            // Fetch service requests for this booking
-            const serviceRequestsResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/service-requests?roomId=${booking.roomId}`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                }
-            );
-
-            const serviceRequests = await serviceRequestsResponse.json();
-
-            // Filter completed service requests for this booking
-            const completedServices = Array.isArray(serviceRequests)
-                ? serviceRequests.filter((req: any) => req.status === 'completed')
-                : [];
-
-            // Calculate service charges
-            const serviceCharges = completedServices.map((req: any) => ({
-                description: req.description,
-                items: req.items,
-                amount: parseFloat(req.totalAmount || 0),
-                date: req.createdAt
-            }));
-
-            const totalServiceCharges = serviceCharges.reduce((sum, charge) => sum + charge.amount, 0);
-
-            // Calculate room charges
             const checkInDate = new Date(booking.checkInDate);
             const checkOutDate = new Date(booking.checkOutDate);
-            const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
-            const pricePerNight = booking.room?.pricePerNight || 0;
+            const nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
+            const pricePerNight = Number(booking.room?.pricePerNight || 0);
             const roomCharges = nights * pricePerNight;
 
-            // If room charges are 0, use payment amount minus service charges
-            const finalRoomCharges = roomCharges > 0 ? roomCharges : (payment.amount - totalServiceCharges);
+            // Fetch actual service requests for this booking
+            let serviceCharges: any[] = [];
+            let totalServiceCharges = 0;
+            try {
+                const srRes = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/service-requests/room/${booking.roomId}`,
+                    { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
+                );
+                const srData = await srRes.json();
+                const allCompleted = Array.isArray(srData)
+                    ? srData.filter((r: any) => r.status === 'completed')
+                    : [];
 
-            // Reconstruct invoice from payment and booking data
-            const invoiceData = {
-                invoiceNumber: `INV-${payment.id}-${Date.now()}`,
+                // Primary: match by bookingId
+                let forThisBooking = allCompleted.filter((r: any) => r.bookingId === booking.id);
+
+                // Fallback 1: requests during the stay period
+                if (forThisBooking.length === 0 && allCompleted.length > 0) {
+                    const stayStart = new Date(booking.checkInDate).getTime();
+                    const stayEnd = new Date(booking.checkOutDate).getTime();
+                    forThisBooking = allCompleted.filter((r: any) => {
+                        const t = new Date(r.createdAt).getTime();
+                        return t >= stayStart && t <= stayEnd;
+                    });
+                }
+
+                // Fallback 2: just use all completed for room (keeps actual item details)
+                if (forThisBooking.length === 0 && allCompleted.length > 0) {
+                    forThisBooking = allCompleted;
+                }
+
+                const flattenReq = (req: any) => {
+                    let items: any[] = [];
+                    try {
+                        items = typeof req.items === 'string' ? JSON.parse(req.items) : (Array.isArray(req.items) ? req.items : []);
+                    } catch (_) { items = []; }
+                    return items.length > 0
+                        ? items.map((item: any) => ({
+                            description: item.name,
+                            quantity: Number(item.quantity || 1),
+                            unitPrice: Number(item.price || 0),
+                            amount: Number(item.price || 0) * Number(item.quantity || 1),
+                            date: req.createdAt
+                        }))
+                        : [{ description: req.description || 'Room Service', quantity: 1, unitPrice: Number(req.totalAmount || 0), amount: Number(req.totalAmount || 0), date: req.createdAt }];
+                };
+
+                serviceCharges = forThisBooking.flatMap(flattenReq);
+
+                totalServiceCharges = serviceCharges.reduce((s, c) => s + c.amount, 0);
+            } catch (_) {
+                // network/parse error — derive from payment total
+            }
+
+            // Final safety net: if we still have no service lines but the total is higher than room charges,
+            // derive the service amount from the difference so the invoice always adds up correctly
+            if (serviceCharges.length === 0) {
+                const derived = Math.round((Number(payment.amount) - roomCharges) * 100) / 100;
+                if (derived > 0) {
+                    totalServiceCharges = derived;
+                    serviceCharges = [{ description: 'Room Service Charges', quantity: 1, unitPrice: derived, amount: derived, date: payment.paymentDate }];
+                }
+            }
+
+            setInvoice({
+                invoiceNumber: `INV-${payment.id}-${booking.id}`,
                 paymentId: payment.id,
                 invoiceDate: payment.paymentDate,
-                booking: {
-                    id: booking.id,
-                    checkInDate: booking.checkInDate,
-                    checkOutDate: booking.checkOutDate,
-                    nights: nights
-                },
-                guest: booking.guest || {
-                    name: 'Guest',
-                    email: 'N/A',
-                    phone: 'N/A'
-                },
-                room: booking.room || {
-                    roomNumber: 'N/A',
-                    type: 'N/A',
-                    pricePerNight: 0
-                },
+                booking: { id: booking.id, checkInDate: booking.checkInDate, checkInTime: booking.checkInTime, checkOutDate: booking.checkOutDate, checkOutTime: booking.checkOutTime, nights },
+                guest: booking.guest || { name: 'Guest', email: 'N/A', phone: 'N/A' },
+                room: booking.room || { roomNumber: 'N/A', type: 'N/A', pricePerNight: 0 },
                 charges: {
-                    roomCharges: {
-                        description: `Room ${booking.room?.roomNumber || 'N/A'} - ${nights} night(s) @ ₹${pricePerNight}/night`,
-                        amount: finalRoomCharges
-                    },
-                    serviceCharges: serviceCharges,
-                    totalServiceCharges: totalServiceCharges
+                    roomCharges: { description: `Room ${booking.room?.roomNumber || 'N/A'} - ${nights} night(s) @ ₹${pricePerNight}/night`, amount: roomCharges },
+                    serviceCharges,
+                    totalServiceCharges
                 },
                 totalAmount: payment.amount,
                 paymentStatus: payment.status
-            };
-
-            setInvoice(invoiceData);
+            });
             setShowInvoiceModal(true);
         } catch (error) {
             console.error('Error loading invoice:', error);
@@ -153,6 +162,7 @@ export default function PaymentsPage() {
             setLoadingInvoice(false);
         }
     };
+
 
     const getPaymentMethodIcon = (method: string) => {
         switch (method) {

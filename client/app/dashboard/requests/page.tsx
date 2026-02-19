@@ -15,13 +15,13 @@ interface ServiceRequest {
     notes?: string;
     createdAt: string;
     completedAt?: string;
+    room?: { id: number; roomNumber: string; type: string; };
 }
 
 export default function RequestsPage() {
     const [requests, setRequests] = useState<ServiceRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState<string>('all');
-    const [filterType, setFilterType] = useState<string>('all');
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [notes, setNotes] = useState('');
@@ -98,7 +98,6 @@ export default function RequestsPage() {
 
     const filteredRequests = requests.filter(req => {
         if (filterStatus !== 'all' && req.status !== filterStatus) return false;
-        if (filterType !== 'all' && req.type !== filterType) return false;
         return true;
     });
 
@@ -150,33 +149,19 @@ export default function RequestsPage() {
                 </div>
 
                 {/* Filters */}
-                <div className="flex gap-4 mt-6">
-                    <div className="flex-1">
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Status</label>
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500"
-                        >
-                            <option value="all">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
-                    <div className="flex-1">
-                        <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Type</label>
-                        <select
-                            value={filterType}
-                            onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500"
-                        >
-                            <option value="all">All Types</option>
-                            <option value="food">Food Orders</option>
-                            <option value="room_service">Room Service</option>
-                        </select>
-                    </div>
+                <div className="mt-6">
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Filter by Status</label>
+                    <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:ring-1 focus:ring-cyan-500"
+                    >
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
                 </div>
             </header>
 
@@ -194,7 +179,7 @@ export default function RequestsPage() {
                         <i className="fa-solid fa-inbox text-6xl text-slate-600 mb-4"></i>
                         <h2 className="text-2xl font-bold text-slate-300 mb-2">No Requests Found</h2>
                         <p className="text-slate-500">
-                            {filterStatus !== 'all' || filterType !== 'all'
+                            {filterStatus !== 'all'
                                 ? 'Try adjusting your filters'
                                 : 'Guest service requests will appear here'}
                         </p>
@@ -216,7 +201,7 @@ export default function RequestsPage() {
                                             <i className={`fa-solid ${getTypeIcon(request.type)} text-lg`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">Room {request.roomId}</h3>
+                                            <h3 className="font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">Room {request.room?.roomNumber ?? request.roomId}</h3>
                                             <p className="text-xs text-slate-400">{formatDate(request.createdAt)}</p>
                                         </div>
                                     </div>
@@ -340,7 +325,7 @@ export default function RequestsPage() {
                             </button>
                         </div>
                         <p className="text-sm text-slate-400 mb-4">
-                            Room {selectedRequest.roomId} - {selectedRequest.description}
+                            Room {selectedRequest.room?.roomNumber ?? selectedRequest.roomId} - {selectedRequest.description}
                         </p>
                         <textarea
                             value={notes}

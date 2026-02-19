@@ -46,6 +46,7 @@ export interface Booking {
     paymentStatus: 'pending' | 'partial' | 'paid';
     bookingStatus: 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
     specialRequests: string;
+    secondaryGuests?: any[];
 }
 
 export interface Payment {

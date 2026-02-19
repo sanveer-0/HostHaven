@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface MenuItem {
@@ -28,6 +28,9 @@ function RoomServiceContent() {
     const [submitting, setSubmitting] = useState(false);
     const [myRequests, setMyRequests] = useState<any[]>([]);
     const [showMyRequests, setShowMyRequests] = useState(false);
+    const myRequestsRef = useRef<HTMLDivElement>(null);
+    const [isOccupied, setIsOccupied] = useState<boolean | null>(null);
+    const [activeBookingId, setActiveBookingId] = useState<number | null>(null);
 
     // Room service items
     const roomServiceItems = [
@@ -44,11 +47,31 @@ function RoomServiceContent() {
         loadMenu();
         if (roomNumber) {
             loadMyRequests();
+            checkOccupancy();
             // Refresh requests every 15 seconds
             const interval = setInterval(loadMyRequests, 15000);
             return () => clearInterval(interval);
         }
     }, [roomNumber]);
+
+    const checkOccupancy = async () => {
+        try {
+            const roomsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms`);
+            const roomsData = await roomsResponse.json();
+            const rooms = Array.isArray(roomsData) ? roomsData : [];
+            const room = rooms.find((r: any) => r.roomNumber === roomNumber);
+            if (!room) { setIsOccupied(false); return; }
+
+            const bookingsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/room/${room.id}`);
+            const bookingsData = await bookingsResponse.json();
+            const bookings = Array.isArray(bookingsData) ? bookingsData : [];
+            const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
+            setIsOccupied(!!activeBooking);
+            if (activeBooking) setActiveBookingId(activeBooking.id);
+        } catch {
+            setIsOccupied(false);
+        }
+    };
 
     const loadMenu = async () => {
         try {
@@ -73,7 +96,17 @@ function RoomServiceContent() {
             if (room) {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-requests/room/${room.id}`);
                 const data = await response.json();
-                setMyRequests(Array.isArray(data) ? data : []);
+                const all = Array.isArray(data) ? data : [];
+                // Only show requests from the current active booking
+                const bookingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/room/${room.id}`);
+                const bookingsData = await bookingsRes.json();
+                const bookings = Array.isArray(bookingsData) ? bookingsData : [];
+                const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
+                if (activeBooking) {
+                    setMyRequests(all.filter((r: any) => r.bookingId === activeBooking.id));
+                } else {
+                    setMyRequests([]);
+                }
             }
         } catch (error) {
             console.error('Error loading requests:', error);
@@ -126,6 +159,11 @@ function RoomServiceContent() {
 
         if (cart.length === 0 && selectedServices.length === 0) {
             alert('Please add items to your order');
+            return;
+        }
+
+        if (!isOccupied) {
+            alert('This room is currently unoccupied. Service requests can only be submitted for checked-in guests.');
             return;
         }
 
@@ -211,7 +249,7 @@ function RoomServiceContent() {
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 pb-6 text-slate-100 relative overflow-x-hidden">
 
             {/* Header */}
-            <header className="glass-dark border-b border-white/5 p-4 md:p-6 sticky top-0 z-50">
+            <header className="glass-dark border-b border-white/5 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 md:gap-4">
@@ -226,18 +264,6 @@ function RoomServiceContent() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 md:gap-3">
-                            <button
-                                onClick={() => setShowMyRequests(!showMyRequests)}
-                                className="px-3 py-2 md:px-4 md:py-2 glass-dark hover:bg-white/10 text-slate-200 rounded-xl font-medium transition-all border border-white/10 relative text-sm"
-                            >
-                                <i className="fa-solid fa-clock-rotate-left md:mr-2"></i>
-                                <span className="hidden md:inline">My Requests</span>
-                                {myRequests.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
-                                        {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length}
-                                    </span>
-                                )}
-                            </button>
                             {(cart.length > 0 || selectedServices.length > 0) && (
                                 <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl font-semibold text-sm md:text-base shadow-lg shadow-cyan-500/30">
                                     ₹{calculateTotal()}
@@ -248,10 +274,32 @@ function RoomServiceContent() {
                 </div>
             </header>
 
+            {/* Floating My Requests Button */}
+            <button
+                onClick={() => {
+                    const isOpening = !showMyRequests;
+                    setShowMyRequests(isOpening);
+                    if (isOpening) {
+                        setTimeout(() => {
+                            myRequestsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 50);
+                    }
+                }}
+                className="fixed bottom-6 right-4 md:right-6 z-50 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-2xl font-semibold shadow-xl shadow-cyan-900/40 transition-all border border-white/10 text-sm"
+            >
+                <i className="fa-solid fa-clock-rotate-left"></i>
+                <span>My Requests</span>
+                {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length > 0 && (
+                    <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+                        {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length}
+                    </span>
+                )}
+            </button>
+
             <div className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-6 relative z-10">
                 {/* My Requests Section */}
                 {showMyRequests && (
-                    <div className="mb-6 glass-dark rounded-2xl p-6 border border-white/10 animate-scale-in">
+                    <div ref={myRequestsRef} className="mb-6 glass-dark rounded-2xl p-6 border border-white/10 animate-scale-in">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-2xl font-bold text-slate-100">My Requests</h2>
                             <button
@@ -388,36 +436,74 @@ function RoomServiceContent() {
                                     <div key={category}>
                                         <h3 className="text-lg md:text-xl font-bold text-teal-300 mb-4 capitalize px-2 border-l-4 border-teal-500">{category}</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
-                                            {items.map(item => (
-                                                <div
-                                                    key={item.id}
-                                                    className="glass-card-dark rounded-2xl p-5 hover:shadow-2xl hover:shadow-black/40 transition-all duration-300 group ring-1 ring-white/5 hover:ring-cyan-500/30"
-                                                >
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className="flex-1 pr-3">
-                                                            <h4 className="font-bold text-slate-100 flex items-center gap-2 text-base md:text-lg group-hover:text-cyan-300 transition-colors">
-                                                                {item.name}
-                                                                {item.isVegetarian && (
-                                                                    <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-green-500 flex items-center justify-center flex-shrink-0 rounded-sm" title="Vegetarian">
-                                                                        <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></span>
-                                                                    </span>
-                                                                )}
-                                                            </h4>
-                                                            <p className="text-xs md:text-sm text-slate-400 line-clamp-2 mt-1">{item.description}</p>
-                                                        </div>
-                                                        <span className="text-base md:text-xl font-bold text-teal-400 flex-shrink-0 drop-shadow-sm">₹{item.price}</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => addToCart(item)}
-                                                        className="w-full mt-3 px-4 py-2.5 bg-slate-800 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-medium transition-all text-sm md:text-base border border-white/5 hover:border-transparent group-hover:shadow-lg shadow-black/20"
+                                            {items.map(item => {
+                                                const cartItem = cart.find(c => c.id === item.id);
+                                                const inCart = !!cartItem;
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        className={`rounded-2xl p-5 transition-all duration-300 group relative ${inCart
+                                                            ? 'bg-cyan-950/60 ring-2 ring-cyan-500/60 shadow-lg shadow-cyan-900/30'
+                                                            : 'glass-card-dark ring-1 ring-white/5 hover:ring-cyan-500/30 hover:shadow-2xl hover:shadow-black/40'
+                                                            }`}
                                                     >
-                                                        <div className="flex items-center justify-center gap-2">
-                                                            <i className="fa-solid fa-plus"></i>
-                                                            Add to Order
+                                                        <div className="flex justify-between items-start mb-1">
+                                                            <div className="flex-1 pr-3">
+                                                                <h4 className={`font-bold flex items-center gap-2 text-base md:text-lg transition-colors ${inCart ? 'text-cyan-300' : 'text-slate-100 group-hover:text-cyan-300'}`}>
+                                                                    {item.name}
+                                                                    {item.isVegetarian && (
+                                                                        <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-green-500 flex items-center justify-center flex-shrink-0 rounded-sm" title="Vegetarian">
+                                                                            <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></span>
+                                                                        </span>
+                                                                    )}
+                                                                </h4>
+                                                                <p className="text-xs md:text-sm text-slate-400 line-clamp-2 mt-1">{item.description}</p>
+                                                            </div>
+                                                            <span className="text-base md:text-xl font-bold text-teal-400 flex-shrink-0 drop-shadow-sm">₹{item.price}</span>
                                                         </div>
-                                                    </button>
-                                                </div>
-                                            ))}
+
+                                                        {/* "In cart" badge — inline, below description */}
+                                                        {inCart && (
+                                                            <span className="inline-flex items-center gap-1 mt-2 mb-1 bg-cyan-500/20 text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-cyan-500/30">
+                                                                <i className="fa-solid fa-check text-[10px]"></i>
+                                                                Added to order
+                                                            </span>
+                                                        )}
+
+                                                        {inCart ? (
+                                                            /* Inline quantity controls */
+                                                            <div className="mt-3 flex items-center justify-between gap-2 bg-slate-900/50 rounded-xl p-1">
+                                                                <button
+                                                                    onClick={() => updateQuantity(item.id, cartItem.quantity - 1)}
+                                                                    className="flex-1 py-2 bg-slate-700 hover:bg-red-500/40 text-white rounded-lg flex items-center justify-center transition-colors"
+                                                                >
+                                                                    <i className="fa-solid fa-minus text-xs"></i>
+                                                                </button>
+                                                                <span className="w-10 text-center font-bold text-slate-100 text-base">
+                                                                    {cartItem.quantity}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => updateQuantity(item.id, cartItem.quantity + 1)}
+                                                                    className="flex-1 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg flex items-center justify-center transition-colors shadow-lg shadow-cyan-900/20"
+                                                                >
+                                                                    <i className="fa-solid fa-plus text-xs"></i>
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            /* Add to Order button */
+                                                            <button
+                                                                onClick={() => addToCart(item)}
+                                                                className="w-full mt-3 px-4 py-2.5 bg-slate-800 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-medium transition-all text-sm md:text-base border border-white/5 hover:border-transparent group-hover:shadow-lg shadow-black/20"
+                                                            >
+                                                                <div className="flex items-center justify-center gap-2">
+                                                                    <i className="fa-solid fa-plus"></i>
+                                                                    Add to Order
+                                                                </div>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 );
@@ -484,18 +570,34 @@ function RoomServiceContent() {
                     </div>
                 )}
 
+                {/* Unoccupied room warning */}
+                {isOccupied === false && (
+                    <div className="mt-6 flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+                        <i className="fa-solid fa-triangle-exclamation text-amber-400 text-xl mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <p className="font-semibold text-amber-300 text-sm">Room Not Occupied</p>
+                            <p className="text-amber-400/80 text-xs mt-0.5">Service requests can only be placed for rooms with an active check-in. Please contact the front desk if you need assistance.</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Submit Button */}
                 {(cart.length > 0 || selectedServices.length > 0) && (
                     <div className="mt-4 md:mt-6 sticky bottom-0 bg-gradient-to-t from-slate-900 via-slate-900/90 to-transparent pt-6 pb-4 md:pb-0 md:static md:bg-none z-40">
                         <button
                             onClick={handleSubmit}
-                            disabled={submitting}
-                            className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-800 text-white font-bold rounded-xl shadow-lg shadow-cyan-900/40 transition-all text-base md:text-lg border border-white/10"
+                            disabled={submitting || isOccupied === false}
+                            className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-800 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg shadow-cyan-900/40 transition-all text-base md:text-lg border border-white/10"
                         >
                             {submitting ? (
                                 <>
                                     <i className="fa-solid fa-spinner fa-spin mr-2"></i>
                                     Submitting...
+                                </>
+                            ) : isOccupied === false ? (
+                                <>
+                                    <i className="fa-solid fa-ban mr-2"></i>
+                                    Room Not Occupied
                                 </>
                             ) : (
                                 <>

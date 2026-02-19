@@ -156,10 +156,25 @@ const deleteRequest = async (req, res) => {
     }
 };
 
+// @desc    Clear all requests for a room
+// @route   DELETE /api/service-requests/room/:roomId
+// @access  Private
+const clearRoomRequests = async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        const deleted = await ServiceRequest.destroy({ where: { roomId } });
+        res.json({ message: `Cleared ${deleted} request(s) for room ${roomId}` });
+    } catch (error) {
+        console.error('Error clearing room requests:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createRequest,
     getRequests,
     getRequest,
     updateRequest,
-    deleteRequest
+    deleteRequest,
+    clearRoomRequests
 };
