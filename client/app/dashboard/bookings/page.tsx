@@ -16,6 +16,24 @@ export default function BookingsPage() {
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [invoice, setInvoice] = useState<any>(null);
     const [today, setToday] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [guestHistoryGuest, setGuestHistoryGuest] = useState<{ name: string; phone: string; email: string; guestId: number } | null>(null);
+
+    // Filter bookings by guest name, phone or email
+    const filteredBookings = bookings.filter(b => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase();
+        return (
+            b.guest?.name?.toLowerCase().includes(q) ||
+            (b.guest as any)?.phone?.toLowerCase().includes(q) ||
+            b.guest?.email?.toLowerCase().includes(q)
+        );
+    });
+
+    // Get all bookings for a specific guest (for history modal)
+    const guestHistory = guestHistoryGuest
+        ? bookings.filter(b => b.guestId === guestHistoryGuest.guestId)
+        : [];
     const [formData, setFormData] = useState({
         primaryGuest: {
             name: '',
@@ -210,6 +228,30 @@ export default function BookingsPage() {
                 </div>
             </header>
 
+            {/* Guest Search Bar */}
+            <div className="px-8 py-3 border-b border-white/5 flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                    <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                    <input
+                        type="text"
+                        placeholder="Search guest by name, phone or email..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-10 py-2.5 bg-slate-800/60 border border-slate-600/40 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 text-sm transition-all"
+                    />
+                    {searchQuery && (
+                        <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors">
+                            <i className="fa-solid fa-times text-xs"></i>
+                        </button>
+                    )}
+                </div>
+                {searchQuery && (
+                    <p className="text-sm text-slate-400">
+                        <span className="text-cyan-400 font-semibold">{filteredBookings.length}</span> result{filteredBookings.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
+                    </p>
+                )}
+            </div>
+
             <div className="flex-1 overflow-y-auto p-8">
                 <div className="glass-card-dark rounded-2xl overflow-hidden shadow-lg animate-fade-in border border-white/5">
                     <div className="overflow-x-auto">
@@ -233,8 +275,8 @@ export default function BookingsPage() {
                                             <p className="text-slate-400">Loading bookings...</p>
                                         </td>
                                     </tr>
-                                ) : bookings.length > 0 ? (
-                                    bookings.map((booking) => (
+                                ) : filteredBookings.length > 0 ? (
+                                    filteredBookings.map((booking) => (
                                         <tr
                                             key={booking.id}
                                             className="hover:bg-white/5 transition-colors group cursor-pointer"
@@ -248,7 +290,15 @@ export default function BookingsPage() {
                                                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-semibold shadow-lg shadow-cyan-900/30">
                                                         {booking.guest?.name?.[0] || 'U'}
                                                     </div>
-                                                    <span className="text-slate-200 font-medium group-hover:text-cyan-300 transition-colors">{booking.guest?.name || 'Unknown'}</span>
+                                                    <div>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setGuestHistoryGuest({ name: booking.guest?.name || 'Unknown', phone: (booking.guest as any)?.phone || '', email: booking.guest?.email || '', guestId: booking.guestId }); }}
+                                                            className="text-slate-200 font-medium hover:text-cyan-300 transition-colors hover:underline text-left"
+                                                        >
+                                                            {booking.guest?.name || 'Unknown'}
+                                                        </button>
+                                                        {(booking.guest as any)?.phone && <p className="text-xs text-slate-500">{(booking.guest as any).phone}</p>}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -695,6 +745,84 @@ export default function BookingsPage() {
                     invoice={invoice}
                     onClose={() => setShowInvoiceModal(false)}
                 />
+            )}
+
+            {/* Guest History Modal */}
+            {guestHistoryGuest && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="glass-dark border border-white/10 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in">
+                        {/* Header */}
+                        <div className="flex items-start justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-cyan-900/30">
+                                    {guestHistoryGuest.name[0]}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-100">{guestHistoryGuest.name}</h3>
+                                    <div className="flex flex-col gap-0.5 mt-1">
+                                        {guestHistoryGuest.email && <p className="text-xs text-slate-400"><i className="fa-solid fa-envelope mr-1.5"></i>{guestHistoryGuest.email}</p>}
+                                        {guestHistoryGuest.phone && <p className="text-xs text-slate-400"><i className="fa-solid fa-phone mr-1.5"></i>{guestHistoryGuest.phone}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                            <button onClick={() => setGuestHistoryGuest(null)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 flex items-center justify-center transition-colors">
+                                <i className="fa-solid fa-times"></i>
+                            </button>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="grid grid-cols-3 gap-3 mb-6">
+                            <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-white/5">
+                                <p className="text-2xl font-bold text-cyan-400">{guestHistory.length}</p>
+                                <p className="text-xs text-slate-400 mt-0.5">Total Stays</p>
+                            </div>
+                            <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-white/5">
+                                <p className="text-2xl font-bold text-emerald-400">
+                                    ₹{guestHistory.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0).toLocaleString()}
+                                </p>
+                                <p className="text-xs text-slate-400 mt-0.5">Total Spent</p>
+                            </div>
+                            <div className="bg-slate-800/50 rounded-xl p-3 text-center border border-white/5">
+                                <p className="text-2xl font-bold text-purple-400">
+                                    {guestHistory.filter(b => b.bookingStatus === 'checked-in').length > 0 ? 'Active' : 'Inactive'}
+                                </p>
+                                <p className="text-xs text-slate-400 mt-0.5">Status</p>
+                            </div>
+                        </div>
+
+                        {/* Booking History */}
+                        <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Booking History</h4>
+                        {guestHistory.length === 0 ? (
+                            <p className="text-slate-500 text-sm text-center py-6">No bookings found</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {guestHistory.sort((a, b) => b.id - a.id).map(b => (
+                                    <div
+                                        key={b.id}
+                                        className="bg-slate-800/40 border border-white/5 rounded-xl p-4 flex items-center gap-4 hover:bg-slate-800/60 transition-colors cursor-pointer"
+                                        onClick={() => { setSelectedBooking(b); setShowDetailsModal(true); setGuestHistoryGuest(null); }}
+                                    >
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                                            {b.room?.roomNumber || '?'}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-slate-200">Room {b.room?.roomNumber} — {b.room?.type}</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">
+                                                {new Date(b.checkInDate).toLocaleDateString()} → {new Date(b.checkOutDate).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                        <div className="text-right flex-shrink-0">
+                                            <p className="text-sm font-bold text-slate-200">₹{Number(b.totalAmount).toLocaleString()}</p>
+                                            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold uppercase ${getStatusColor(b.bookingStatus)}`}>
+                                                {b.bookingStatus}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
         </>
     );
