@@ -160,6 +160,7 @@ const seedDummyData = async () => {
                     await ServiceRequest.create({
                         bookingId: booking.id,
                         roomId: rooms[ri].id,
+                        type: 'room_service',
                         description: svc.description,
                         items: JSON.stringify([{ name: svc.description, price: svc.amount, quantity: 1 }]),
                         totalAmount: svc.amount,
@@ -191,6 +192,7 @@ const seedDummyData = async () => {
             {
                 bookingId: activeBooking.id,
                 roomId: activeRoom.id,
+                type: 'room_service',
                 description: 'Extra Towels',
                 items: JSON.stringify([{ name: 'Extra Towels', price: 0, quantity: 2 }]),
                 totalAmount: 0,
@@ -199,6 +201,7 @@ const seedDummyData = async () => {
             {
                 bookingId: activeBooking.id,
                 roomId: activeRoom.id,
+                type: 'food',
                 description: 'Lunch order',
                 items: JSON.stringify([
                     { name: 'Veg Biryani', price: 280, quantity: 2 },
@@ -210,6 +213,7 @@ const seedDummyData = async () => {
             {
                 bookingId: activeBooking.id,
                 roomId: activeRoom.id,
+                type: 'room_service',
                 description: 'Pillow request',
                 items: JSON.stringify([{ name: 'Pillows', price: 0, quantity: 1 }]),
                 totalAmount: 0,
