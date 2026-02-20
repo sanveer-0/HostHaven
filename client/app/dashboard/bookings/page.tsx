@@ -132,7 +132,7 @@ export default function BookingsPage() {
                 },
                 body: JSON.stringify({
                     name: formData.primaryGuest.name,
-                    email: formData.primaryGuest.email,
+                    email: formData.primaryGuest.email.trim() || null,
                     phone: formData.primaryGuest.phone,
                     address: formData.primaryGuest.address,
                     idProofType: formData.primaryGuest.idProofType,
@@ -401,12 +401,11 @@ export default function BookingsPage() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Email *</label>
+                                            <label className="block text-sm font-semibold text-slate-400 mb-2">Email <span className="text-slate-500 font-normal">(optional)</span></label>
                                             <input
                                                 type="email"
                                                 value={formData.primaryGuest.email}
                                                 onChange={(e) => setFormData({ ...formData, primaryGuest: { ...formData.primaryGuest, email: e.target.value } })}
-                                                required
                                                 placeholder="john@example.com"
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-600"
                                             />

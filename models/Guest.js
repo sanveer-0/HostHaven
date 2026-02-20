@@ -16,10 +16,9 @@ const Guest = sequelize.define('Guest', {
     },
     email: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
         validate: {
-            isEmail: { msg: 'Please add a valid email' },
-            notEmpty: { msg: 'Please add guest email' }
+            isEmail: { msg: 'Please add a valid email' }
         }
     },
     phone: {
