@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { API_URL } from '@/lib/api';
 
 interface MenuItem {
     id: number;
@@ -56,13 +57,13 @@ function RoomServiceContent() {
 
     const checkOccupancy = async () => {
         try {
-            const roomsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/rooms`);
+            const roomsResponse = await fetch(`${API_URL}/rooms`);
             const roomsData = await roomsResponse.json();
             const rooms = Array.isArray(roomsData) ? roomsData : [];
             const room = rooms.find((r: any) => r.roomNumber === roomNumber);
             if (!room) { setIsOccupied(false); return; }
 
-            const bookingsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/bookings/room/${room.id}`);
+            const bookingsResponse = await fetch(`${API_URL}/bookings/room/${room.id}`);
             const bookingsData = await bookingsResponse.json();
             const bookings = Array.isArray(bookingsData) ? bookingsData : [];
             const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
@@ -75,7 +76,7 @@ function RoomServiceContent() {
 
     const loadMenu = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/menu`);
+            const response = await fetch(`${API_URL}/menu`);
             const data = await response.json();
             setMenu(Array.isArray(data) ? data : []);
         } catch (error) {
@@ -88,17 +89,17 @@ function RoomServiceContent() {
 
     const loadMyRequests = async () => {
         try {
-            const roomsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/rooms`);
+            const roomsResponse = await fetch(`${API_URL}/rooms`);
             const roomsData = await roomsResponse.json();
             const rooms = Array.isArray(roomsData) ? roomsData : [];
             const room = rooms.find((r: any) => r.roomNumber === roomNumber);
 
             if (room) {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests/room/${room.id}`);
+                const response = await fetch(`${API_URL}/service-requests/room/${room.id}`);
                 const data = await response.json();
                 const all = Array.isArray(data) ? data : [];
                 // Only show requests from the current active booking
-                const bookingsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/bookings/room/${room.id}`);
+                const bookingsRes = await fetch(`${API_URL}/bookings/room/${room.id}`);
                 const bookingsData = await bookingsRes.json();
                 const bookings = Array.isArray(bookingsData) ? bookingsData : [];
                 const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
@@ -169,7 +170,7 @@ function RoomServiceContent() {
 
         setSubmitting(true);
         try {
-            const roomsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/rooms`);
+            const roomsResponse = await fetch(`${API_URL}/rooms`);
             const roomsData = await roomsResponse.json();
             const rooms = Array.isArray(roomsData) ? roomsData : [];
             const room = rooms.find((r: any) => r.roomNumber === roomNumber);
@@ -178,7 +179,7 @@ function RoomServiceContent() {
                 throw new Error('Room not found');
             }
 
-            const bookingsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/bookings/room/${room.id}`);
+            const bookingsResponse = await fetch(`${API_URL}/bookings/room/${room.id}`);
             const bookingsData = await bookingsResponse.json();
             const bookings = Array.isArray(bookingsData) ? bookingsData : [];
             const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
@@ -206,7 +207,7 @@ function RoomServiceContent() {
                 totalAmount: calculateTotal()
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests`, {
+            const response = await fetch(`${API_URL}/service-requests`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)

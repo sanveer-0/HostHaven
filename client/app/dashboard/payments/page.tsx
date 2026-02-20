@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { paymentsAPI, bookingsAPI, Payment, Booking } from '@/lib/api';
+import { paymentsAPI, bookingsAPI, Payment, Booking, API_URL } from '@/lib/api';
 import InvoiceModal from '@/components/InvoiceModal';
 
 export default function PaymentsPage() {
@@ -80,7 +80,7 @@ export default function PaymentsPage() {
             let totalServiceCharges = 0;
             try {
                 const srRes = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/service-requests/room/${booking.roomId}`,
+                    `${API_URL}/service-requests/room/${booking.roomId}`,
                     { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
                 );
                 const srData = await srRes.json();

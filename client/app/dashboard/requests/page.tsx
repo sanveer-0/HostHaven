@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { socket } from '@/lib/socket';
 import { useNotification } from '@/context/NotificationContext';
+import { API_URL } from '@/lib/api';
 
 interface ServiceRequest {
     id: number;
@@ -52,7 +53,7 @@ export default function RequestsPage() {
 
     const loadRequests = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests`, {
+            const response = await fetch(`${API_URL}/service-requests`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -70,7 +71,7 @@ export default function RequestsPage() {
 
     const updateStatus = async (id: number, status: string) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests/${id}`, {
+            const response = await fetch(`${API_URL}/service-requests/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export default function RequestsPage() {
         if (!selectedRequest) return;
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests/${selectedRequest.id}`, {
+            const response = await fetch(`${API_URL}/service-requests/${selectedRequest.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

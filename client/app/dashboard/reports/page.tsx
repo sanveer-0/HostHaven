@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { bookingsAPI } from '@/lib/api';
+import { bookingsAPI, API_URL } from '@/lib/api';
 
 export default function ReportsPage() {
     const [dateRange, setDateRange] = useState({
@@ -42,7 +42,7 @@ export default function ReportsPage() {
         setLoading(true);
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/reports/bookings?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}&format=${format}`,
+                `${API_URL}/reports/bookings?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}&format=${format}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`

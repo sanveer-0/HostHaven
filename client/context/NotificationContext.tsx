@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { socket } from '@/lib/socket';
+import { API_URL } from '@/lib/api';
 
 interface NotificationContextType {
     pendingRequestCount: number;
@@ -31,7 +32,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 const token = localStorage.getItem('token');
                 if (!token) return;
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests?status=pending`, {
+                const response = await fetch(`${API_URL}/service-requests?status=pending`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
