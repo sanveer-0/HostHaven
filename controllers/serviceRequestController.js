@@ -22,6 +22,13 @@ const createRequest = async (req, res) => {
 
         console.log('✅ Service request created:', request.id, 'Type:', type);
 
+        // Emit socket event
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('new_service_request', request);
+            console.log('📡 Emitted new_service_request event');
+        }
+
         // If there's a charge, add it to the booking's total amount
         if (totalAmount && totalAmount > 0) {
             const booking = await Booking.findByPk(bookingId);

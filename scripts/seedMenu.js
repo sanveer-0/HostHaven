@@ -2,8 +2,11 @@ const { MenuItem } = require('../models');
 
 const seedMenu = async () => {
     try {
+        console.log('Starting seedMenu...');
         // Check if menu already has items
         const count = await MenuItem.count();
+        console.log('Current menu count:', count);
+
         if (count > 0) {
             console.log('Menu already seeded');
             return;
@@ -51,3 +54,7 @@ const seedMenu = async () => {
 };
 
 module.exports = seedMenu;
+
+if (require.main === module) {
+    seedMenu();
+}

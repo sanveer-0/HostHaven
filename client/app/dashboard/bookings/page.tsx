@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { bookingsAPI, roomsAPI, Booking, Room } from '@/lib/api';
+import { bookingsAPI, roomsAPI, Booking, Room, API_URL } from '@/lib/api';
 import InvoiceModal from '@/components/InvoiceModal';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://hosthaven-backend.onrender.com/api';
+
 
 export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
@@ -15,6 +15,7 @@ export default function BookingsPage() {
     const [showInvoiceModal, setShowInvoiceModal] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [invoice, setInvoice] = useState<any>(null);
+    const [today, setToday] = useState('');
     const [formData, setFormData] = useState({
         primaryGuest: {
             name: '',
@@ -34,6 +35,8 @@ export default function BookingsPage() {
 
     useEffect(() => {
         loadData();
+        // Compute today's date on the client to avoid stale build-time values
+        setToday(new Date().toISOString().split('T')[0]);
     }, []);
 
     const loadData = async () => {
@@ -338,7 +341,7 @@ export default function BookingsPage() {
                                             <input
                                                 type="date"
                                                 value={formData.checkInDate}
-                                                min={new Date().toISOString().split('T')[0]}
+                                                min={today}
                                                 onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value, checkOutDate: '' })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"
@@ -351,7 +354,7 @@ export default function BookingsPage() {
                                                 value={formData.checkOutDate}
                                                 min={formData.checkInDate
                                                     ? new Date(new Date(formData.checkInDate).getTime() + 86400000).toISOString().split('T')[0]
-                                                    : new Date().toISOString().split('T')[0]}
+                                                    : today}
                                                 onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
                                                 required
                                                 className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 placeholder-slate-500"

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { socket } from '@/lib/socket';
+import { useNotification } from '@/context/NotificationContext';
 
 interface ServiceRequest {
     id: number;
@@ -25,17 +27,32 @@ export default function RequestsPage() {
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [notes, setNotes] = useState('');
+    const { resetCount } = useNotification();
 
     useEffect(() => {
         loadRequests();
-        // Refresh every 30 seconds
+        resetCount();
+
+        // Socket listener for real-time updates
+        const handleNewRequest = () => {
+            loadRequests();
+            resetCount(); // Keep badge cleared while on this page
+        };
+
+        socket.on('new_service_request', handleNewRequest);
+
+        // Refresh every 30 seconds as backup
         const interval = setInterval(loadRequests, 30000);
-        return () => clearInterval(interval);
+
+        return () => {
+            clearInterval(interval);
+            socket.off('new_service_request', handleNewRequest);
+        };
     }, []);
 
     const loadRequests = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-requests`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -53,7 +70,7 @@ export default function RequestsPage() {
 
     const updateStatus = async (id: number, status: string) => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-requests/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +92,7 @@ export default function RequestsPage() {
         if (!selectedRequest) return;
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-requests/${selectedRequest.id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/service-requests/${selectedRequest.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
