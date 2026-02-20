@@ -27,6 +27,10 @@ const connectDB = async () => {
         // Seed rooms
         const seedRooms = require('../scripts/seedRooms');
         await seedRooms();
+
+        // Seed dummy data (guests, bookings, payments, service requests)
+        const seedDummyData = require('../scripts/seedDummyData');
+        await seedDummyData();
     } catch (error) {
         console.error('❌ Error: ' + error.message);
         process.exit(1);
