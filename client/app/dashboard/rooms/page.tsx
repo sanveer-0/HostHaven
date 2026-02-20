@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { roomsAPI, bookingsAPI, Room, Booking } from '@/lib/api';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import InvoiceModal from '@/components/InvoiceModal';
 
 export default function RoomsPage() {
@@ -15,6 +15,7 @@ export default function RoomsPage() {
     const [invoice, setInvoice] = useState<any>(null);
     const [qrCodeData, setQrCodeData] = useState('');
     const [selectedRoomForQR, setSelectedRoomForQR] = useState<Room | null>(null);
+    const qrCanvasRef = useRef<HTMLCanvasElement>(null);
     const [editingRoom, setEditingRoom] = useState<Room | null>(null);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [roomBookings, setRoomBookings] = useState<Booking[]>([]);
@@ -129,10 +130,21 @@ export default function RoomsPage() {
 
     const handleViewQR = async (room: Room) => {
         setSelectedRoomForQR(room);
-        // Generate QR code URL - in production this would call the backend QR generator
         const qrUrl = `${window.location.origin}/room-service?room=${room.roomNumber}`;
         setQrCodeData(qrUrl);
         setShowQRModal(true);
+    };
+
+    const handleDownloadQR = () => {
+        if (!qrCanvasRef.current || !selectedRoomForQR) return;
+        const canvas = qrCanvasRef.current;
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `room-${selectedRoomForQR.roomNumber}-qr.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     const handleOpenGuestInterface = (room: Room) => {
@@ -574,11 +586,12 @@ export default function RoomsPage() {
 
                         <div className="text-center">
                             <div className="bg-white p-6 rounded-xl border-4 border-cyan-500 inline-block mb-4 shadow-lg shadow-cyan-500/20">
-                                <QRCodeSVG
+                                <QRCodeCanvas
+                                    ref={qrCanvasRef}
                                     value={qrCodeData}
                                     size={256}
                                     level="H"
-                                    includeMargin={true}
+                                    marginSize={2}
                                 />
                             </div>
 
@@ -591,10 +604,7 @@ export default function RoomsPage() {
 
                             <div className="flex gap-3">
                                 <button
-                                    onClick={() => {
-                                        // In production, this would download the QR code
-                                        alert('QR Code download feature coming soon!');
-                                    }}
+                                    onClick={handleDownloadQR}
                                     className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-xl transition-all shadow-lg"
                                 >
                                     <i className="fa-solid fa-download mr-2"></i>
