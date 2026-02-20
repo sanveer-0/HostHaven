@@ -17,6 +17,15 @@ export interface Guest {
     checkInDate: string;
     checkOutDate?: string;
     status: 'active' | 'checked-out';
+    secondaryGuests?: SecondaryGuest[];
+}
+
+export interface SecondaryGuest {
+    id: number;
+    guestId: number;
+    name: string;
+    age?: number;
+    idProofURL?: string;
 }
 
 export interface Room {
@@ -46,7 +55,6 @@ export interface Booking {
     paymentStatus: 'pending' | 'partial' | 'paid';
     bookingStatus: 'confirmed' | 'checked-in' | 'checked-out' | 'cancelled';
     specialRequests: string;
-    secondaryGuests?: any[];
 }
 
 export interface Payment {

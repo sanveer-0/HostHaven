@@ -7,6 +7,7 @@ const Payment = require('./Payment');
 const RoomToken = require('./RoomToken');
 const MenuItem = require('./MenuItem');
 const ServiceRequest = require('./ServiceRequest');
+const SecondaryGuest = require('./SecondaryGuest');
 
 // Define associations
 Booking.belongsTo(Guest, { foreignKey: 'guestId', as: 'guest' });
@@ -30,6 +31,10 @@ ServiceRequest.belongsTo(Room, { foreignKey: 'roomId', as: 'room' });
 Booking.hasMany(ServiceRequest, { foreignKey: 'bookingId', as: 'serviceRequests' });
 Room.hasMany(ServiceRequest, { foreignKey: 'roomId', as: 'serviceRequests' });
 
+// Secondary Guest associations
+Guest.hasMany(SecondaryGuest, { foreignKey: 'guestId', as: 'secondaryGuests' });
+SecondaryGuest.belongsTo(Guest, { foreignKey: 'guestId', as: 'primaryGuest' });
+
 module.exports = {
     sequelize,
     User,
@@ -39,5 +44,6 @@ module.exports = {
     Payment,
     RoomToken,
     MenuItem,
-    ServiceRequest
+    ServiceRequest,
+    SecondaryGuest
 };

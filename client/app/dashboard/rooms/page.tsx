@@ -486,11 +486,7 @@ export default function RoomsPage() {
 
                                         {/* Secondary Guests */}
                                         {(() => {
-                                            let sg: any[] = [];
-                                            try {
-                                                const raw = (booking as any).secondaryGuests;
-                                                sg = typeof raw === 'string' ? JSON.parse(raw) : (Array.isArray(raw) ? raw : []);
-                                            } catch (_) { sg = []; }
+                                            const sg: any[] = (booking.guest as any)?.secondaryGuests || [];
                                             return sg.length > 0 ? (
                                                 <div className="mb-4">
                                                     <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-2">

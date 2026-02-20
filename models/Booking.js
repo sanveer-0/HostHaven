@@ -82,11 +82,6 @@ const Booking = sequelize.define('Booking', {
     specialRequests: {
         type: DataTypes.TEXT,
         defaultValue: ''
-    },
-    secondaryGuests: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: []
     }
 }, {
     timestamps: true,

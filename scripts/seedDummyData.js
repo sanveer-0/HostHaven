@@ -1,4 +1,4 @@
-const { Guest, Booking, Room, Payment, ServiceRequest } = require('../models');
+const { Guest, Booking, Room, Payment, ServiceRequest, SecondaryGuest } = require('../models');
 
 const d = (str) => new Date(str + 'T12:00:00.000Z');
 const nights = (ci, co) => Math.round((new Date(co) - new Date(ci)) / 86400000);
@@ -181,10 +181,15 @@ const seedDummyData = async () => {
             checkInDate: d('2026-02-18'),
             checkOutDate: d('2026-02-23'),
             numberOfGuests: 2,
-            totalAmount: 5 * activeRoom.pricePerNight, // will grow with service
+            totalAmount: 5 * activeRoom.pricePerNight,
             paymentStatus: 'pending',
             bookingStatus: 'checked-in',
-            secondaryGuests: JSON.stringify([{ name: 'Meera Sharma', age: 29 }]),
+        });
+        // Add secondary guest linked to Rahul Sharma's guest record
+        await SecondaryGuest.create({
+            guestId: g(2).id,
+            name: 'Meera Sharma',
+            age: 29
         });
         await activeRoom.update({ status: 'occupied' });
 

@@ -579,14 +579,14 @@ export default function BookingsPage() {
                             </div>
 
                             {/* Secondary Guests */}
-                            {selectedBooking.secondaryGuests && selectedBooking.secondaryGuests.length > 0 && (
+                            {(selectedBooking.guest as any)?.secondaryGuests?.length > 0 && (
                                 <div className="bg-slate-800/50 p-5 rounded-xl border border-white/5">
                                     <h4 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
                                         <i className="fa-solid fa-users text-purple-400"></i>
                                         Additional Guests
                                     </h4>
                                     <div className="space-y-3">
-                                        {selectedBooking.secondaryGuests.map((guest: any, index: number) => (
+                                        {(selectedBooking.guest as any).secondaryGuests.map((guest: any, index: number) => (
                                             <div key={index} className="flex items-center gap-4 bg-slate-900/50 p-3 rounded-lg border border-white/5">
                                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs">
                                                     {guest.name?.[0] || 'G'}

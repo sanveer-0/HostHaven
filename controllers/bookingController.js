@@ -1,4 +1,4 @@
-const { Booking, Room, Guest, RoomToken } = require('../models');
+const { Booking, Room, Guest, RoomToken, SecondaryGuest } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 const { sendBookingConfirmation, sendInvoiceEmail } = require('../services/emailService');
 
@@ -12,7 +12,8 @@ const getBookings = async (req, res) => {
                 {
                     model: Guest,
                     as: 'guest',
-                    attributes: ['name', 'email', 'phone']
+                    attributes: ['name', 'email', 'phone'],
+                    include: [{ model: SecondaryGuest, as: 'secondaryGuests' }]
                 },
                 {
                     model: Room,
@@ -35,7 +36,11 @@ const getBooking = async (req, res) => {
     try {
         const booking = await Booking.findByPk(req.params.id, {
             include: [
-                { model: Guest, as: 'guest' },
+                {
+                    model: Guest,
+                    as: 'guest',
+                    include: [{ model: SecondaryGuest, as: 'secondaryGuests' }]
+                },
                 { model: Room, as: 'room' }
             ]
         });
@@ -54,7 +59,7 @@ const getBooking = async (req, res) => {
 // @access  Private
 const createBooking = async (req, res) => {
     try {
-        const { roomId, checkInDate, checkOutDate } = req.body;
+        const { roomId, checkInDate, checkOutDate, secondaryGuests: secondaryGuestData } = req.body;
 
         // Validate dates
         if (new Date(checkOutDate) <= new Date(checkInDate)) {
@@ -70,16 +75,35 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Room is not available' });
         }
 
-        // Create booking
-        console.log('Creating booking with secondaryGuests:', JSON.stringify(req.body.secondaryGuests));
-        const booking = await Booking.create(req.body);
+        // Create booking (without secondaryGuests field)
+        const bookingBody = { ...req.body };
+        delete bookingBody.secondaryGuests;
+        const booking = await Booking.create(bookingBody);
+
+        // Create secondary guest rows linked to the primary guest
+        if (Array.isArray(secondaryGuestData) && secondaryGuestData.length > 0) {
+            await Promise.all(
+                secondaryGuestData.map(sg =>
+                    SecondaryGuest.create({
+                        guestId: booking.guestId,
+                        name: sg.name,
+                        age: sg.age || null,
+                        idProofURL: sg.idProofURL || null
+                    })
+                )
+            );
+        }
 
         // Update room status
         await roomData.update({ status: 'occupied' });
 
         const populatedBooking = await Booking.findByPk(booking.id, {
             include: [
-                { model: Guest, as: 'guest' },
+                {
+                    model: Guest,
+                    as: 'guest',
+                    include: [{ model: SecondaryGuest, as: 'secondaryGuests' }]
+                },
                 { model: Room, as: 'room' }
             ]
         });
@@ -189,14 +213,14 @@ const deleteBooking = async (req, res) => {
 // @access  Private
 const getBookingsByRoom = async (req, res) => {
     try {
-        console.log('Fetching bookings for room ID:', req.params.roomId);
         const bookings = await Booking.findAll({
             where: { roomId: req.params.roomId },
             include: [
                 {
                     model: Guest,
                     as: 'guest',
-                    attributes: ['name', 'email', 'phone', 'address', 'idProofType', 'idProofNumber']
+                    attributes: ['name', 'email', 'phone', 'address', 'idProofType', 'idProofNumber'],
+                    include: [{ model: SecondaryGuest, as: 'secondaryGuests' }]
                 },
                 {
                     model: Room,
@@ -206,13 +230,6 @@ const getBookingsByRoom = async (req, res) => {
             ],
             order: [['checkInDate', 'DESC']]
         });
-
-        // Debug log to check if secondaryGuests is present
-        if (bookings.length > 0) {
-            console.log('Sample booking secondaryGuests:', JSON.stringify(bookings[0].secondaryGuests));
-        } else {
-            console.log('No bookings found for this room.');
-        }
 
         res.json(bookings);
     } catch (error) {
