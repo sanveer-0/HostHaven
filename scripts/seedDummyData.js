@@ -150,7 +150,8 @@ const seedDummyData = async () => {
                 bookingId: booking.id,
                 amount: total,
                 paymentMethod: payMethod,
-                paymentStatus: 'completed',
+                status: 'completed',
+                paymentDate: d(co),
                 notes: JSON.stringify(invoice),
             });
 
