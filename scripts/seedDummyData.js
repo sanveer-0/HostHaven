@@ -1,8 +1,10 @@
 const { Guest, Booking, Room, Payment, ServiceRequest } = require('../models');
 
+const d = (str) => new Date(str + 'T12:00:00.000Z');
+const nights = (ci, co) => Math.round((new Date(co) - new Date(ci)) / 86400000);
+
 const seedDummyData = async () => {
     try {
-        // Skip if bookings already exist
         const existingBookings = await Booking.count();
         if (existingBookings > 0) {
             console.log('Dummy data already seeded');
@@ -10,225 +12,184 @@ const seedDummyData = async () => {
         }
 
         const rooms = await Room.findAll({ order: [['roomNumber', 'ASC']] });
-        if (rooms.length === 0) {
-            console.log('No rooms found, skipping dummy data seed');
+        if (rooms.length < 5) {
+            console.log('Not enough rooms for dummy seed, skipping');
             return;
         }
 
-        // ── Helpers ──────────────────────────────────────────────────────────────
-        const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); d.setHours(12, 0, 0, 0); return d; };
-        const daysFrom = (base, n) => { const d = new Date(base); d.setDate(d.getDate() + n); return d; };
+        // rooms[0]=101 Single ₹1500  rooms[1]=102 Double ₹2500
+        // rooms[2]=201 Deluxe ₹3500  rooms[3]=202 Suite ₹5000
+        // rooms[4]=301 Family ₹6000
 
-        // ── Guests ────────────────────────────────────────────────────────────────
-        const guests = await Guest.bulkCreate([
-            {
-                name: 'Arjun Mehta',
-                email: 'arjun.mehta@gmail.com',
-                phone: '9876543210',
-                address: '14 Marine Lines, Mumbai, Maharashtra',
-                idProofType: 'aadhaar',
-                idProofNumber: '1234 5678 9012',
-                status: 'checked-out',
-            },
-            {
-                name: 'Priya Iyer',
-                email: 'priya.iyer@outlook.com',
-                phone: '8765432109',
-                address: '27 Anna Nagar, Chennai, Tamil Nadu',
-                idProofType: 'passport',
-                idProofNumber: 'N8524136',
-                status: 'checked-out',
-            },
-            {
-                name: 'Rahul Sharma',
-                email: 'rahul.sharma@yahoo.com',
-                phone: '7654321098',
-                address: '5 Connaught Place, New Delhi',
-                idProofType: 'driving_license',
-                idProofNumber: 'DL0520100112345',
-                status: 'checked-in',
-            },
-            {
-                name: 'Sneha Patel',
-                email: 'sneha.patel@gmail.com',
-                phone: '9543216780',
-                address: '88 CG Road, Ahmedabad, Gujarat',
-                idProofType: 'aadhaar',
-                idProofNumber: '9876 5432 1098',
-                status: 'checked-out',
-            },
-            {
-                name: 'Vikram Nair',
-                email: 'vikram.nair@gmail.com',
-                phone: '9321456780',
-                address: '3 MG Road, Kochi, Kerala',
-                idProofType: 'passport',
-                idProofNumber: 'K3716249',
-                status: 'checked-out',
-            },
-            {
-                name: 'Divya Reddy',
-                email: 'divya.reddy@gmail.com',
-                phone: '8891234560',
-                address: '12 Banjara Hills, Hyderabad, Telangana',
-                idProofType: 'national_id',
-                idProofNumber: 'TS2023456789',
-                status: 'checked-out',
-            },
-        ]);
+        // ── Guests ────────────────────────────────────────────────────────────
+        const guestData = [
+            { name: 'Arjun Mehta', email: 'arjun.mehta@gmail.com', phone: '9876543210', address: '14 Marine Lines, Mumbai, MH', idProofType: 'aadhaar', idProofNumber: '1234 5678 9012', status: 'checked-out' },
+            { name: 'Priya Iyer', email: 'priya.iyer@outlook.com', phone: '8765432109', address: '27 Anna Nagar, Chennai, TN', idProofType: 'passport', idProofNumber: 'N8524136', status: 'checked-out' },
+            { name: 'Rahul Sharma', email: 'rahul.sharma@yahoo.com', phone: '7654321098', address: '5 Connaught Place, New Delhi', idProofType: 'driving_license', idProofNumber: 'DL0520100112345', status: 'checked-in' },
+            { name: 'Sneha Patel', email: 'sneha.patel@gmail.com', phone: '9543216780', address: '88 CG Road, Ahmedabad, GJ', idProofType: 'aadhaar', idProofNumber: '9876 5432 1098', status: 'checked-out' },
+            { name: 'Vikram Nair', email: 'vikram.nair@gmail.com', phone: '9321456780', address: '3 MG Road, Kochi, KL', idProofType: 'passport', idProofNumber: 'K3716249', status: 'checked-out' },
+            { name: 'Divya Reddy', email: 'divya.reddy@gmail.com', phone: '8891234560', address: '12 Banjara Hills, Hyderabad, TS', idProofType: 'national_id', idProofNumber: 'TS2023456789', status: 'checked-out' },
+            { name: 'Rohan Kapoor', email: 'rohan.kapoor@gmail.com', phone: '9012345678', address: '64 Indiranagar, Bengaluru, KA', idProofType: 'aadhaar', idProofNumber: '3456 7890 1234', status: 'checked-out' },
+            { name: 'Ananya Singh', email: 'ananya.singh@gmail.com', phone: '8123456790', address: '19 Park Street, Kolkata, WB', idProofType: 'passport', idProofNumber: 'B4127839', status: 'checked-out' },
+        ];
+        const guests = await Guest.bulkCreate(guestData);
+        const g = (i) => guests[i];
 
-        // ── Bookings ──────────────────────────────────────────────────────────────
-        // Use available rooms safely
-        const r = (i) => rooms[i % rooms.length];
+        // ── Booking definitions ───────────────────────────────────────────────
+        // Each: [guestIdx, roomIdx, checkIn, checkOut, numGuests, payMethod, svcCharges]
+        // svcCharges = array of {description, amount} or []
+        const defs = [
+            // ───── ROOM 101 — Single ₹1500 ─────────────────────────────────
+            [0, 0, '2025-12-01', '2025-12-04', 1, 'upi', []],
+            [1, 0, '2025-12-08', '2025-12-12', 1, 'cash', [{ description: 'Extra Towels', amount: 0 }]],
+            [2, 0, '2025-12-16', '2025-12-19', 1, 'card', []],
+            [3, 0, '2025-12-23', '2025-12-28', 1, 'upi', []],
+            [4, 0, '2026-01-03', '2026-01-06', 1, 'cash', []],
+            [5, 0, '2026-01-10', '2026-01-14', 1, 'card', [{ description: 'Room Cleaning', amount: 200 }]],
+            [0, 0, '2026-01-18', '2026-01-21', 1, 'upi', []],
+            [1, 0, '2026-01-25', '2026-01-28', 1, 'cash', []],
+            [6, 0, '2026-02-02', '2026-02-05', 1, 'card', []],
+            [7, 0, '2026-02-10', '2026-02-13', 1, 'upi', [{ description: 'Toiletries Pack', amount: 150 }]],
 
-        //  1. Past booking — 45 days ago  (3 nights, single, paid, checked-out)
-        const ci1 = daysAgo(45);
-        const co1 = daysFrom(ci1, 3);
-        const nights1 = 3;
-        const amount1 = nights1 * r(0).pricePerNight;
-        const b1 = await Booking.create({
-            guestId: guests[0].id,
-            roomId: r(0).id,
-            checkInDate: ci1,
-            checkOutDate: co1,
-            numberOfGuests: 1,
-            totalAmount: amount1,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+            // ───── ROOM 102 — Double ₹2500 ─────────────────────────────────
+            [1, 1, '2025-12-02', '2025-12-07', 2, 'card', []],
+            [2, 1, '2025-12-11', '2025-12-15', 2, 'upi', [{ description: 'Breakfast ×2', amount: 480 }]],
+            [4, 1, '2025-12-19', '2025-12-23', 2, 'cash', []],
+            [5, 1, '2025-12-27', '2025-12-31', 2, 'upi', []],
+            [6, 1, '2026-01-04', '2026-01-08', 2, 'card', []],
+            [7, 1, '2026-01-12', '2026-01-16', 2, 'cash', [{ description: 'Dinner ×2', amount: 620 }]],
+            [0, 1, '2026-01-20', '2026-01-24', 2, 'upi', []],
+            [3, 1, '2026-01-28', '2026-02-01', 2, 'card', []],
+            [1, 1, '2026-02-05', '2026-02-09', 2, 'upi', [{ description: 'Veg Biryani ×2', amount: 560 }]],
+            [5, 1, '2026-02-13', '2026-02-17', 2, 'cash', []],
 
-        //  2. Past booking — 38 days ago  (5 nights, double, paid, checked-out)
-        const ci2 = daysAgo(38);
-        const co2 = daysFrom(ci2, 5);
-        const nights2 = 5;
-        const amount2 = nights2 * r(1).pricePerNight;
-        const b2 = await Booking.create({
-            guestId: guests[1].id,
-            roomId: r(1).id,
-            checkInDate: ci2,
-            checkOutDate: co2,
-            numberOfGuests: 2,
-            totalAmount: amount2,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+            // ───── ROOM 201 — Deluxe ₹3500 ─────────────────────────────────
+            [2, 2, '2025-12-03', '2025-12-08', 2, 'upi', []],
+            [3, 2, '2025-12-12', '2025-12-16', 2, 'card', [{ description: 'Spa Service', amount: 1200 }]],
+            [0, 2, '2025-12-20', '2025-12-25', 3, 'cash', []],
+            [5, 2, '2025-12-28', '2026-01-02', 2, 'upi', []],
+            [1, 2, '2026-01-06', '2026-01-11', 2, 'card', [{ description: 'Breakfast ×2 ×5d', amount: 1200 }]],
+            [4, 2, '2026-01-15', '2026-01-20', 3, 'upi', []],
+            [7, 2, '2026-01-24', '2026-01-28', 2, 'cash', []],
+            [3, 2, '2026-02-01', '2026-02-06', 2, 'card', [{ description: 'Laundry Service', amount: 400 }]],
+            [6, 2, '2026-02-10', '2026-02-14', 2, 'upi', []],
+            [0, 2, '2026-02-17', '2026-02-20', 2, 'cash', []],
 
-        //  3. Past booking — 30 days ago  (7 nights, deluxe, paid)
-        const ci3 = daysAgo(30);
-        const co3 = daysFrom(ci3, 7);
-        const nights3 = 7;
-        const amount3 = nights3 * r(2).pricePerNight;
-        const b3 = await Booking.create({
-            guestId: guests[3].id,
-            roomId: r(2).id,
-            checkInDate: ci3,
-            checkOutDate: co3,
-            numberOfGuests: 3,
-            totalAmount: amount3,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+            // ───── ROOM 202 — Suite ₹5000 ──────────────────────────────────
+            [3, 3, '2025-12-01', '2025-12-06', 3, 'card', [{ description: 'Flowers & Welcome Kit', amount: 800 }]],
+            [4, 3, '2025-12-10', '2025-12-15', 4, 'upi', []],
+            [5, 3, '2025-12-19', '2025-12-24', 3, 'cash', [{ description: 'Dinner Buffet ×2', amount: 950 }]],
+            [6, 3, '2025-12-28', '2026-01-02', 2, 'card', []],
+            [7, 3, '2026-01-06', '2026-01-11', 4, 'upi', [{ description: 'Extra Mattress', amount: 500 }]],
+            [0, 3, '2026-01-15', '2026-01-20', 3, 'card', []],
+            [1, 3, '2026-01-24', '2026-01-29', 2, 'upi', [{ description: 'Spa for 2', amount: 2200 }]],
+            [2, 3, '2026-02-02', '2026-02-07', 3, 'cash', []],
+            [4, 3, '2026-02-11', '2026-02-16', 4, 'card', [{ description: 'Anniversary Package', amount: 1500 }]],
 
-        //  4. Past booking — 20 days ago  (4 nights, suite, paid)
-        const ci4 = daysAgo(20);
-        const co4 = daysFrom(ci4, 4);
-        const nights4 = 4;
-        const amount4 = nights4 * r(3 % rooms.length).pricePerNight;
-        const b4 = await Booking.create({
-            guestId: guests[4].id,
-            roomId: r(3 % rooms.length).id,
-            checkInDate: ci4,
-            checkOutDate: co4,
-            numberOfGuests: 2,
-            totalAmount: amount4,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+            // ───── ROOM 301 — Family ₹6000 ─────────────────────────────────
+            [5, 4, '2025-12-02', '2025-12-08', 5, 'upi', []],
+            [6, 4, '2025-12-13', '2025-12-18', 4, 'card', [{ description: 'Kids Meal Package', amount: 1200 }]],
+            [7, 4, '2025-12-22', '2025-12-28', 5, 'cash', []],
+            [3, 4, '2026-01-02', '2026-01-07', 4, 'upi', [{ description: 'Breakfast ×4 ×5d', amount: 2000 }]],
+            [4, 4, '2026-01-11', '2026-01-17', 5, 'card', []],
+            [0, 4, '2026-01-22', '2026-01-27', 4, 'upi', [{ description: 'Dinner ×4', amount: 1800 }]],
+            [5, 4, '2026-02-01', '2026-02-07', 5, 'cash', []],
+            [7, 4, '2026-02-12', '2026-02-17', 4, 'card', [{ description: 'Family Activity Package', amount: 2500 }]],
+        ];
 
-        //  5. Past booking — 12 days ago  (2 nights, single, paid)
-        const ci5 = daysAgo(12);
-        const co5 = daysFrom(ci5, 2);
-        const nights5 = 2;
-        const amount5 = nights5 * r(0).pricePerNight;
-        const b5 = await Booking.create({
-            guestId: guests[5].id,
-            roomId: r(0).id,
-            checkInDate: ci5,
-            checkOutDate: co5,
-            numberOfGuests: 1,
-            totalAmount: amount5,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+        let invoiceCounter = 1000;
+        const bookingObjs = [];
 
-        //  6. Past booking — 8 days ago  (3 nights, family, paid)
-        const ci6 = daysAgo(8);
-        const co6 = daysFrom(ci6, 3);
-        const nights6 = 3;
-        const lastRoomIdx = rooms.length > 4 ? 4 : rooms.length - 1;
-        const amount6 = nights6 * r(lastRoomIdx).pricePerNight;
-        const b6 = await Booking.create({
-            guestId: guests[0].id,
-            roomId: r(lastRoomIdx).id,
-            checkInDate: ci6,
-            checkOutDate: co6,
-            numberOfGuests: 4,
-            totalAmount: amount6,
-            paymentStatus: 'paid',
-            bookingStatus: 'checked-out',
-        });
+        for (const [gi, ri, ci, co, numG, payMethod, svcCharges] of defs) {
+            const n = nights(ci, co);
+            const roomCharge = n * rooms[ri].pricePerNight;
+            const svcTotal = svcCharges.reduce((s, c) => s + c.amount, 0);
+            const total = roomCharge + svcTotal;
 
-        //  7. ACTIVE check-in — checked in 2 days ago, checking out in 3 days
-        //     Uses room index 1 (double) and marks it occupied
-        const activeRoom = r(1);
-        const ci7 = daysAgo(2);
-        const co7 = daysFrom(new Date(), 3);
-        const nights7 = 5;
-        const amount7 = nights7 * activeRoom.pricePerNight;
-        const b7 = await Booking.create({
-            guestId: guests[2].id,       // Rahul Sharma
+            const booking = await Booking.create({
+                guestId: g(gi).id,
+                roomId: rooms[ri].id,
+                checkInDate: d(ci),
+                checkOutDate: d(co),
+                numberOfGuests: numG,
+                totalAmount: total,
+                paymentStatus: 'paid',
+                bookingStatus: 'checked-out',
+            });
+
+            invoiceCounter++;
+            const invoice = {
+                invoiceNumber: `INV-${invoiceCounter}`,
+                booking: {
+                    id: booking.id,
+                    checkInDate: ci,
+                    checkOutDate: co,
+                    nights: n,
+                    numberOfGuests: numG,
+                    paymentStatus: 'completed',
+                },
+                room: {
+                    roomNumber: rooms[ri].roomNumber,
+                    type: rooms[ri].type,
+                    pricePerNight: rooms[ri].pricePerNight,
+                },
+                guest: {
+                    name: g(gi).name,
+                    email: g(gi).email,
+                    phone: g(gi).phone,
+                },
+                charges: {
+                    roomCharges: { description: `${n} nights × ₹${rooms[ri].pricePerNight}`, amount: roomCharge },
+                    serviceCharges: svcCharges,
+                },
+                totalAmount: total,
+                paymentStatus: 'completed',
+            };
+
+            await Payment.create({
+                bookingId: booking.id,
+                amount: total,
+                paymentMethod: payMethod,
+                paymentStatus: 'completed',
+                notes: JSON.stringify(invoice),
+            });
+
+            // Add service request records for bookings with service charges
+            if (svcCharges.length > 0) {
+                for (const svc of svcCharges) {
+                    await ServiceRequest.create({
+                        bookingId: booking.id,
+                        roomId: rooms[ri].id,
+                        description: svc.description,
+                        items: JSON.stringify([{ name: svc.description, price: svc.amount, quantity: 1 }]),
+                        totalAmount: svc.amount,
+                        status: 'completed',
+                    });
+                }
+            }
+
+            bookingObjs.push(booking);
+        }
+
+        // ── Active Check-in: Rahul Sharma in Room 102, Feb 18–23 ─────────────
+        const activeRoom = rooms[1]; // 102 Double
+        const activeBooking = await Booking.create({
+            guestId: g(2).id, // Rahul Sharma
             roomId: activeRoom.id,
-            checkInDate: ci7,
-            checkOutDate: co7,
+            checkInDate: d('2026-02-18'),
+            checkOutDate: d('2026-02-23'),
             numberOfGuests: 2,
-            totalAmount: amount7,
+            totalAmount: 5 * activeRoom.pricePerNight, // will grow with service
             paymentStatus: 'pending',
             bookingStatus: 'checked-in',
             secondaryGuests: JSON.stringify([{ name: 'Meera Sharma', age: 29 }]),
         });
-
-        // Mark that room as occupied
         await activeRoom.update({ status: 'occupied' });
 
-        // ── Payments for completed bookings ────────────────────────────────────
-        const completedBookings = [b1, b2, b3, b4, b5, b6];
-        const invoiceData = (b, room, guest, nights) => ({
-            invoiceNumber: `INV-SEED-${b.id}`,
-            booking: {
-                id: b.id, checkInDate: b.checkInDate, checkOutDate: b.checkOutDate,
-                nights, numberOfGuests: b.numberOfGuests, paymentStatus: 'completed',
-            },
-            room: { roomNumber: room.roomNumber, type: room.type, pricePerNight: room.pricePerNight },
-            guest: { name: guest.name, email: guest.email, phone: guest.phone },
-            charges: {
-                roomCharges: { description: `${nights} nights × ₹${room.pricePerNight}`, amount: b.totalAmount },
-                serviceCharges: [],
-            },
-            totalAmount: b.totalAmount,
-            paymentStatus: 'completed',
-        });
-
-        await Payment.create({ bookingId: b1.id, amount: amount1, paymentMethod: 'upi', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b1, r(0), guests[0], nights1)) });
-        await Payment.create({ bookingId: b2.id, amount: amount2, paymentMethod: 'card', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b2, r(1), guests[1], nights2)) });
-        await Payment.create({ bookingId: b3.id, amount: amount3, paymentMethod: 'cash', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b3, r(2), guests[3], nights3)) });
-        await Payment.create({ bookingId: b4.id, amount: amount4, paymentMethod: 'upi', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b4, r(3 % rooms.length), guests[4], nights4)) });
-        await Payment.create({ bookingId: b5.id, amount: amount5, paymentMethod: 'cash', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b5, r(0), guests[5], nights5)) });
-        await Payment.create({ bookingId: b6.id, amount: amount6, paymentMethod: 'card', paymentStatus: 'completed', notes: JSON.stringify(invoiceData(b6, r(lastRoomIdx), guests[0], nights6)) });
-
-        // ── Service requests for the active booking ───────────────────────────
+        // Active service requests on the current booking
         await ServiceRequest.bulkCreate([
             {
-                bookingId: b7.id,
+                bookingId: activeBooking.id,
                 roomId: activeRoom.id,
                 description: 'Extra Towels',
                 items: JSON.stringify([{ name: 'Extra Towels', price: 0, quantity: 2 }]),
@@ -236,9 +197,9 @@ const seedDummyData = async () => {
                 status: 'completed',
             },
             {
-                bookingId: b7.id,
+                bookingId: activeBooking.id,
                 roomId: activeRoom.id,
-                description: 'Food order — Lunch',
+                description: 'Lunch order',
                 items: JSON.stringify([
                     { name: 'Veg Biryani', price: 280, quantity: 2 },
                     { name: 'Masala Chai', price: 60, quantity: 2 },
@@ -246,9 +207,17 @@ const seedDummyData = async () => {
                 totalAmount: 680,
                 status: 'in-progress',
             },
+            {
+                bookingId: activeBooking.id,
+                roomId: activeRoom.id,
+                description: 'Pillow request',
+                items: JSON.stringify([{ name: 'Pillows', price: 0, quantity: 1 }]),
+                totalAmount: 0,
+                status: 'pending',
+            },
         ]);
 
-        console.log(`✅ Dummy data seeded: ${guests.length} guests, 7 bookings (1 active), 6 payments, 2 service requests`);
+        console.log(`✅ Dummy data seeded: 8 guests, ${defs.length + 1} bookings (1 active), ${defs.length} payments, service requests across 3 months`);
     } catch (error) {
         console.error('❌ Error seeding dummy data:', error);
     }
