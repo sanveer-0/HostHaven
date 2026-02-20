@@ -1,24 +1,34 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Gmail SMTP transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
-// Sender address — uses Resend sandbox until you verify a custom domain
-const FROM = 'HostHaven <onboarding@resend.dev>';
+const FROM = `"HostHaven" <${process.env.GMAIL_USER}>`;
 
 /**
  * Send booking confirmation email to the primary guest.
  */
 const sendBookingConfirmation = async ({ guest, booking, room }) => {
-    if (!guest?.email) return;
+  if (!guest?.email) return;
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.warn('⚠️  Email not configured (missing GMAIL_USER / GMAIL_APP_PASSWORD)');
+    return;
+  }
 
-    const checkIn = new Date(booking.checkInDate).toLocaleDateString('en-IN', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-    const checkOut = new Date(booking.checkOutDate).toLocaleDateString('en-IN', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
+  const checkIn = new Date(booking.checkInDate).toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const checkOut = new Date(booking.checkOutDate).toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,34 +120,38 @@ const sendBookingConfirmation = async ({ guest, booking, room }) => {
 </body>
 </html>`;
 
-    try {
-        await resend.emails.send({
-            from: FROM,
-            to: guest.email,
-            subject: `Booking Confirmed — Room ${room.roomNumber} | HostHaven`,
-            html,
-        });
-        console.log(`✉️  Booking confirmation sent to ${guest.email}`);
-    } catch (err) {
-        console.error('Failed to send booking confirmation:', err.message);
-    }
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: guest.email,
+      subject: `Booking Confirmed — Room ${room.roomNumber} | HostHaven`,
+      html,
+    });
+    console.log(`✉️  Booking confirmation sent to ${guest.email}`);
+  } catch (err) {
+    console.error('Failed to send booking confirmation:', err.message);
+  }
 };
 
 /**
  * Send checkout invoice email to the primary guest.
  */
 const sendInvoiceEmail = async ({ guest, invoice }) => {
-    if (!guest?.email) return;
+  if (!guest?.email) return;
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.warn('⚠️  Email not configured (missing GMAIL_USER / GMAIL_APP_PASSWORD)');
+    return;
+  }
 
-    const { booking, room, charges, totalAmount, invoiceNumber, paymentStatus } = invoice;
+  const { booking, room, charges, totalAmount, invoiceNumber, paymentStatus } = invoice;
 
-    const serviceRows = (charges.serviceCharges || []).map(sc => `
+  const serviceRows = (charges.serviceCharges || []).map(sc => `
       <tr>
         <td style="padding:10px 14px;color:#cbd5e1;font-size:13px;">${sc.description}${sc.quantity > 1 ? ` × ${sc.quantity}` : ''}</td>
-        <td style="padding:10px 14px;color:#cbd5e1;font-size:13px;text-align:right;">₹${sc.amount.toFixed(2)}</td>
+        <td style="padding:10px 14px;color:#cbd5e1;font-size:13px;text-align:right;">₹${Number(sc.amount).toFixed(2)}</td>
       </tr>`).join('');
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -237,17 +251,17 @@ const sendInvoiceEmail = async ({ guest, invoice }) => {
 </body>
 </html>`;
 
-    try {
-        await resend.emails.send({
-            from: FROM,
-            to: guest.email,
-            subject: `Your Invoice — HostHaven Stay | ${invoiceNumber}`,
-            html,
-        });
-        console.log(`✉️  Invoice email sent to ${guest.email}`);
-    } catch (err) {
-        console.error('Failed to send invoice email:', err.message);
-    }
+  try {
+    await transporter.sendMail({
+      from: FROM,
+      to: guest.email,
+      subject: `Your Invoice — HostHaven Stay | ${invoiceNumber}`,
+      html,
+    });
+    console.log(`✉️  Invoice email sent to ${guest.email}`);
+  } catch (err) {
+    console.error('Failed to send invoice email:', err.message);
+  }
 };
 
 module.exports = { sendBookingConfirmation, sendInvoiceEmail };
