@@ -32,6 +32,7 @@ function RoomServiceContent() {
     const myRequestsRef = useRef<HTMLDivElement>(null);
     const [isOccupied, setIsOccupied] = useState<boolean | null>(null);
     const [activeBookingId, setActiveBookingId] = useState<number | null>(null);
+    const [checkingOccupancy, setCheckingOccupancy] = useState(false);
 
     // Room service items
     const roomServiceItems = [
@@ -55,22 +56,36 @@ function RoomServiceContent() {
         }
     }, [roomNumber]);
 
-    const checkOccupancy = async () => {
-        try {
-            const roomsResponse = await fetch(`${API_URL}/rooms`);
-            const roomsData = await roomsResponse.json();
-            const rooms = Array.isArray(roomsData) ? roomsData : [];
-            const room = rooms.find((r: any) => r.roomNumber === roomNumber);
-            if (!room) { setIsOccupied(false); return; }
+    const checkOccupancy = async (retries = 3) => {
+        setCheckingOccupancy(true);
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const roomsResponse = await fetch(`${API_URL}/rooms`);
+                if (!roomsResponse.ok) throw new Error('rooms fetch failed');
+                const roomsData = await roomsResponse.json();
+                const rooms = Array.isArray(roomsData) ? roomsData : [];
+                const room = rooms.find((r: any) => r.roomNumber === roomNumber);
+                if (!room) { setIsOccupied(false); setCheckingOccupancy(false); return; }
 
-            const bookingsResponse = await fetch(`${API_URL}/bookings/room/${room.id}`);
-            const bookingsData = await bookingsResponse.json();
-            const bookings = Array.isArray(bookingsData) ? bookingsData : [];
-            const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
-            setIsOccupied(!!activeBooking);
-            if (activeBooking) setActiveBookingId(activeBooking.id);
-        } catch {
-            setIsOccupied(false);
+                const bookingsResponse = await fetch(`${API_URL}/bookings/room/${room.id}`);
+                if (!bookingsResponse.ok) throw new Error('bookings fetch failed');
+                const bookingsData = await bookingsResponse.json();
+                const bookings = Array.isArray(bookingsData) ? bookingsData : [];
+                const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
+                setIsOccupied(!!activeBooking);
+                if (activeBooking) setActiveBookingId(activeBooking.id);
+                setCheckingOccupancy(false);
+                return; // success — stop retrying
+            } catch {
+                if (attempt < retries) {
+                    // Wait 5 seconds before retrying (gives Render time to wake up)
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                } else {
+                    // All retries exhausted
+                    setIsOccupied(false);
+                    setCheckingOccupancy(false);
+                }
+            }
         }
     };
 
@@ -571,13 +586,31 @@ function RoomServiceContent() {
                     </div>
                 )}
 
+                {/* Checking occupancy state */}
+                {checkingOccupancy && (
+                    <div className="mt-6 flex items-center gap-3 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
+                        <i className="fa-solid fa-spinner fa-spin text-blue-400 text-xl flex-shrink-0"></i>
+                        <div>
+                            <p className="font-semibold text-blue-300 text-sm">Checking room status...</p>
+                            <p className="text-blue-400/70 text-xs mt-0.5">This may take a moment while our server wakes up. Please wait.</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Unoccupied room warning */}
-                {isOccupied === false && (
+                {isOccupied === false && !checkingOccupancy && (
                     <div className="mt-6 flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
                         <i className="fa-solid fa-triangle-exclamation text-amber-400 text-xl mt-0.5 flex-shrink-0"></i>
-                        <div>
+                        <div className="flex-1">
                             <p className="font-semibold text-amber-300 text-sm">Room Not Occupied</p>
-                            <p className="text-amber-400/80 text-xs mt-0.5">Service requests can only be placed for rooms with an active check-in. Please contact the front desk if you need assistance.</p>
+                            <p className="text-amber-400/80 text-xs mt-0.5">Service requests can only be placed for rooms with an active check-in. If you just checked in, please wait a moment and try again.</p>
+                            <button
+                                onClick={() => checkOccupancy()}
+                                className="mt-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold rounded-lg border border-amber-500/30 transition-colors"
+                            >
+                                <i className="fa-solid fa-rotate-right mr-1"></i>
+                                Re-check Status
+                            </button>
                         </div>
                     </div>
                 )}
@@ -587,13 +620,18 @@ function RoomServiceContent() {
                     <div className="mt-4 md:mt-6 sticky bottom-0 bg-gradient-to-t from-slate-900 via-slate-900/90 to-transparent pt-6 pb-4 md:pb-0 md:static md:bg-none z-40">
                         <button
                             onClick={handleSubmit}
-                            disabled={submitting || isOccupied === false}
+                            disabled={submitting || isOccupied === false || checkingOccupancy}
                             className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-800 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg shadow-cyan-900/40 transition-all text-base md:text-lg border border-white/10"
                         >
                             {submitting ? (
                                 <>
                                     <i className="fa-solid fa-spinner fa-spin mr-2"></i>
                                     Submitting...
+                                </>
+                            ) : checkingOccupancy ? (
+                                <>
+                                    <i className="fa-solid fa-spinner fa-spin mr-2"></i>
+                                    Checking Room Status...
                                 </>
                             ) : isOccupied === false ? (
                                 <>
