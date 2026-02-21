@@ -197,6 +197,7 @@ export default function PaymentsPage() {
                             <thead>
                                 <tr className="bg-slate-800/50 border-b border-white/5">
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Guest</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Booking Ref</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount</th>
                                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Method</th>
@@ -207,7 +208,7 @@ export default function PaymentsPage() {
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center">
+                                        <td colSpan={7} className="px-6 py-12 text-center">
                                             <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-400 mb-3"></i>
                                             <p className="text-slate-400">Loading payments...</p>
                                         </td>
@@ -219,6 +220,12 @@ export default function PaymentsPage() {
                                             className="hover:bg-white/5 transition-colors group"
                                         >
                                             <td className="px-6 py-4 text-slate-300">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4">
+                                                <div>
+                                                    <p className="text-sm font-medium text-slate-200">{(payment.booking as any)?.guest?.name || 'Unknown'}</p>
+                                                    <p className="text-xs text-slate-500">Room {(payment.booking as any)?.room?.roomNumber || 'N/A'}</p>
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4">
                                                 <span className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-white/10">
                                                     #{payment.bookingId}
