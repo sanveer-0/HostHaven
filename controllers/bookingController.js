@@ -1,6 +1,6 @@
 const { Booking, Room, Guest, RoomToken, SecondaryGuest } = require('../models');
 const { v4: uuidv4 } = require('uuid');
-const { sendBookingConfirmation, sendInvoiceEmail } = require('../services/emailService');
+
 
 // @desc    Get all bookings
 // @route   GET /api/bookings
@@ -108,12 +108,6 @@ const createBooking = async (req, res) => {
             ]
         });
 
-        // Send booking confirmation email (non-blocking)
-        sendBookingConfirmation({
-            guest: populatedBooking.guest,
-            booking: populatedBooking,
-            room: populatedBooking.room
-        });
 
         res.status(201).json(populatedBooking);
     } catch (error) {
@@ -372,11 +366,6 @@ const checkoutBooking = async (req, res) => {
         // Store invoice snapshot in payment record so it can be retrieved later
         await payment.update({ notes: JSON.stringify(invoice) });
 
-        // Send invoice email to guest (non-blocking)
-        sendInvoiceEmail({
-            guest: booking.guest,
-            invoice
-        });
 
         res.json({
             message: 'Checkout successful',
