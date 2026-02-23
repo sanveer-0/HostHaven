@@ -33,6 +33,7 @@ function RoomServiceContent() {
     const [isOccupied, setIsOccupied] = useState<boolean | null>(null);
     const [activeBookingId, setActiveBookingId] = useState<number | null>(null);
     const [checkingOccupancy, setCheckingOccupancy] = useState(false);
+    const [successMsg, setSuccessMsg] = useState('');
 
     // Room service items
     const roomServiceItems = [
@@ -50,7 +51,6 @@ function RoomServiceContent() {
         if (roomNumber) {
             loadMyRequests();
             checkOccupancy();
-            // Refresh requests every 15 seconds
             const interval = setInterval(loadMyRequests, 15000);
             return () => clearInterval(interval);
         }
@@ -75,13 +75,11 @@ function RoomServiceContent() {
                 setIsOccupied(!!activeBooking);
                 if (activeBooking) setActiveBookingId(activeBooking.id);
                 setCheckingOccupancy(false);
-                return; // success — stop retrying
+                return;
             } catch {
                 if (attempt < retries) {
-                    // Wait 5 seconds before retrying (gives Render time to wake up)
                     await new Promise(resolve => setTimeout(resolve, 5000));
                 } else {
-                    // All retries exhausted
                     setIsOccupied(false);
                     setCheckingOccupancy(false);
                 }
@@ -113,7 +111,6 @@ function RoomServiceContent() {
                 const response = await fetch(`${API_URL}/service-requests/room/${room.id}`);
                 const data = await response.json();
                 const all = Array.isArray(data) ? data : [];
-                // Only show requests from the current active booking
                 const bookingsRes = await fetch(`${API_URL}/bookings/room/${room.id}`);
                 const bookingsData = await bookingsRes.json();
                 const bookings = Array.isArray(bookingsData) ? bookingsData : [];
@@ -168,38 +165,20 @@ function RoomServiceContent() {
     };
 
     const handleSubmit = async () => {
-        if (!roomNumber) {
-            alert('Room number not found');
-            return;
-        }
-
-        if (cart.length === 0 && selectedServices.length === 0) {
-            alert('Please add items to your order');
-            return;
-        }
-
-        if (!isOccupied) {
-            alert('This room is currently unoccupied. Service requests can only be submitted for checked-in guests.');
-            return;
-        }
+        if (!roomNumber) { alert('Room number not found'); return; }
+        if (cart.length === 0 && selectedServices.length === 0) { alert('Please add items to your order'); return; }
+        if (!isOccupied) { alert('This room is currently unoccupied. Service requests can only be submitted for checked-in guests.'); return; }
 
         setSubmitting(true);
         try {
             const roomsResponse = await fetch(`${API_URL}/rooms`);
-            const roomsData = await roomsResponse.json();
-            const rooms = Array.isArray(roomsData) ? roomsData : [];
+            const rooms = Array.isArray(await roomsResponse.json()) ? await (await fetch(`${API_URL}/rooms`)).json() : [];
             const room = rooms.find((r: any) => r.roomNumber === roomNumber);
+            if (!room) throw new Error('Room not found');
 
-            if (!room) {
-                throw new Error('Room not found');
-            }
+            const bookings = await (await fetch(`${API_URL}/bookings/room/${room.id}`)).json();
+            const activeBooking = (Array.isArray(bookings) ? bookings : []).find((b: any) => b.bookingStatus === 'checked-in');
 
-            const bookingsResponse = await fetch(`${API_URL}/bookings/room/${room.id}`);
-            const bookingsData = await bookingsResponse.json();
-            const bookings = Array.isArray(bookingsData) ? bookingsData : [];
-            const activeBooking = bookings.find((b: any) => b.bookingStatus === 'checked-in');
-
-            // Combine food and service items
             const allItems = [
                 ...cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
                 ...selectedServices.map(s => {
@@ -215,9 +194,7 @@ function RoomServiceContent() {
                 items: allItems,
                 description: cart.length > 0 && selectedServices.length > 0
                     ? 'Food Order & Room Service Request'
-                    : cart.length > 0
-                        ? 'Food Order'
-                        : 'Room Service Request',
+                    : cart.length > 0 ? 'Food Order' : 'Room Service Request',
                 specialInstructions,
                 totalAmount: calculateTotal()
             };
@@ -229,12 +206,14 @@ function RoomServiceContent() {
             });
 
             if (response.ok) {
-                alert('Request submitted successfully!');
                 setCart([]);
                 setSelectedServices([]);
                 setSpecialInstructions('');
+                setSuccessMsg('Request submitted! We\'ll get to you shortly.');
+                setTimeout(() => setSuccessMsg(''), 5000);
                 loadMyRequests();
                 setShowMyRequests(true);
+                setTimeout(() => myRequestsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
             } else {
                 const error = await response.json();
                 throw new Error(error.message || 'Failed to submit request');
@@ -249,272 +228,267 @@ function RoomServiceContent() {
 
     const categories = ['breakfast', 'lunch', 'dinner', 'snacks', 'beverages'];
 
+    // ── nm-bg style helper
+    const nmCard = { background: 'var(--nm-bg)', boxShadow: '10px 10px 24px var(--nm-sd), -10px -10px 24px var(--nm-sl)', borderRadius: '20px' } as const;
+    const nmRaised = { background: 'var(--nm-bg)', boxShadow: '6px 6px 14px var(--nm-sd), -6px -6px 14px var(--nm-sl)', borderRadius: '14px' } as const;
+    const nmInset = { background: 'var(--nm-bg)', boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', borderRadius: '12px', border: 'none', outline: 'none' } as const;
+
     if (!roomNumber) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex items-center justify-center p-4 text-slate-100 relative overflow-hidden">
-                <div className="glass-dark rounded-2xl p-8 text-center max-w-md relative z-10">
-                    <i className="fa-solid fa-exclamation-triangle text-6xl text-amber-500 mb-4 animate-bounce"></i>
-                    <h1 className="text-2xl font-bold text-slate-100 mb-2">Invalid Access</h1>
-                    <p className="text-slate-300">Please scan the QR code in your room to access room service.</p>
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--nm-bg)' }}>
+                <div className="p-10 text-center max-w-md" style={nmCard}>
+                    <div className="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center" style={{ ...nmRaised, background: '#fff3e0' }}>
+                        <i className="fa-solid fa-exclamation-triangle text-3xl text-amber-500"></i>
+                    </div>
+                    <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--nm-text)' }}>Invalid Access</h1>
+                    <p style={{ color: 'var(--nm-text-2)' }}>Please scan the QR code in your room to access room service.</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 pb-6 text-slate-100 relative overflow-x-hidden">
+        <div className="min-h-screen pb-32" style={{ background: 'var(--nm-bg)' }}>
 
             {/* Header */}
-            <header className="glass-dark border-b border-white/5 p-4 md:p-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 md:gap-4">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                <i className="fa-solid fa-bell-concierge text-lg md:text-xl text-white"></i>
-                            </div>
-                            <div>
-                                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                                    Room Service
-                                </h1>
-                                <p className="text-xs md:text-sm text-slate-400">Room {roomNumber}</p>
-                            </div>
+            <header className="sticky top-0 z-30 px-4 md:px-8 py-4" style={{ background: 'var(--nm-bg)', boxShadow: '0 6px 16px var(--nm-sd)' }}>
+                <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl flex items-center justify-center" style={{ boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)' }}>
+                            <i className="fa-solid fa-bell-concierge text-lg text-white"></i>
                         </div>
-                        <div className="flex items-center gap-2 md:gap-3">
-                            {(cart.length > 0 || selectedServices.length > 0) && (
-                                <div className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl font-semibold text-sm md:text-base shadow-lg shadow-cyan-500/30">
-                                    ₹{calculateTotal()}
-                                </div>
+                        <div>
+                            <h1 className="text-lg font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent">Room Service</h1>
+                            <p className="text-xs" style={{ color: 'var(--nm-text-3)' }}>Room {roomNumber}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {(cart.length > 0 || selectedServices.length > 0) && (
+                            <div className="px-4 py-2 rounded-xl text-white text-sm font-bold bg-gradient-to-r from-teal-400 to-cyan-400" style={{ boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)' }}>
+                                ₹{calculateTotal()}
+                            </div>
+                        )}
+                        <button
+                            onClick={() => {
+                                const isOpening = !showMyRequests;
+                                setShowMyRequests(isOpening);
+                                if (isOpening) setTimeout(() => myRequestsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+                            }}
+                            className="relative px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all"
+                            style={{ ...nmRaised, color: 'var(--nm-text-2)' }}
+                        >
+                            <i className="fa-solid fa-clock-rotate-left"></i>
+                            <span className="hidden sm:inline">My Requests</span>
+                            {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-400 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+                                    {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length}
+                                </span>
                             )}
-                        </div>
+                        </button>
                     </div>
                 </div>
             </header>
 
-            {/* Floating My Requests Button */}
-            <button
-                onClick={() => {
-                    const isOpening = !showMyRequests;
-                    setShowMyRequests(isOpening);
-                    if (isOpening) {
-                        setTimeout(() => {
-                            myRequestsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 50);
-                    }
-                }}
-                className="fixed bottom-6 right-4 md:right-6 z-50 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-2xl font-semibold shadow-xl shadow-cyan-900/40 transition-all border border-white/10 text-sm"
-            >
-                <i className="fa-solid fa-clock-rotate-left"></i>
-                <span>My Requests</span>
-                {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length > 0 && (
-                    <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
-                        {myRequests.filter((r: any) => r.status === 'pending' || r.status === 'in-progress').length}
-                    </span>
+            <div className="max-w-4xl mx-auto px-4 md:px-8 pt-6 space-y-8">
+
+                {/* Success Toast */}
+                {successMsg && (
+                    <div className="flex items-center gap-3 p-4 rounded-2xl animate-scale-in" style={{ background: 'rgba(209,250,229,0.8)', border: '1px solid #6ee7b7' }}>
+                        <i className="fa-solid fa-circle-check text-emerald-500 text-xl flex-shrink-0"></i>
+                        <p className="font-semibold text-emerald-700">{successMsg}</p>
+                    </div>
                 )}
-            </button>
 
-            <div className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-6 relative z-10">
-                {/* My Requests Section */}
+                {/* My Requests Panel */}
                 {showMyRequests && (
-                    <div ref={myRequestsRef} className="mb-6 glass-dark rounded-2xl p-6 border border-white/10 animate-scale-in">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-2xl font-bold text-slate-100">My Requests</h2>
-                            <button
-                                onClick={() => setShowMyRequests(false)}
-                                className="text-slate-400 hover:text-white"
-                            >
-                                <i className="fa-solid fa-times text-xl"></i>
-                            </button>
-                        </div>
-                        {myRequests.length === 0 ? (
-                            <p className="text-center text-slate-500 py-8">No requests yet</p>
-                        ) : (
-                            <div className="space-y-4">
-                                {myRequests.map((request: any) => (
-                                    <div key={request.id} className="bg-slate-800/60 rounded-xl p-4 border border-white/5">
-                                        <div className="flex items-start justify-between mb-2">
-                                            <div>
-                                                <h3 className="font-semibold text-slate-200">{request.description}</h3>
-                                                <p className="text-sm text-slate-400">
-                                                    {new Date(request.createdAt).toLocaleString('en-IN', {
-                                                        day: '2-digit',
-                                                        month: 'short',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </p>
+                    <div ref={myRequestsRef} className="animate-scale-in" style={nmCard}>
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6 pb-4" style={{ borderBottom: '1px solid rgba(197,205,216,0.4)' }}>
+                                <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--nm-text)' }}>
+                                    <i className="fa-solid fa-list-check text-teal-400"></i>
+                                    My Requests
+                                </h2>
+                                <button onClick={() => setShowMyRequests(false)} className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ ...nmRaised, color: 'var(--nm-text-2)' }}>
+                                    <i className="fa-solid fa-times text-sm"></i>
+                                </button>
+                            </div>
+                            {myRequests.length === 0 ? (
+                                <div className="text-center py-10">
+                                    <i className="fa-solid fa-inbox text-4xl mb-3" style={{ color: 'var(--nm-text-3)' }}></i>
+                                    <p style={{ color: 'var(--nm-text-3)' }}>No requests yet</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {myRequests.map((request: any) => (
+                                        <div key={request.id} className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(197,205,216,0.4)' }}>
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <h3 className="font-semibold text-sm" style={{ color: 'var(--nm-text)' }}>{request.description}</h3>
+                                                    <p className="text-xs mt-0.5" style={{ color: 'var(--nm-text-3)' }}>
+                                                        {new Date(request.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                </div>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase border flex-shrink-0 ${request.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                                        request.status === 'in-progress' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                            request.status === 'completed' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                                                'bg-rose-100 text-rose-700 border-rose-200'
+                                                    }`}>
+                                                    {request.status}
+                                                </span>
                                             </div>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${request.status === 'pending' ? 'bg-amber-500/20 text-amber-400' :
-                                                request.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
-                                                    request.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                                                        'bg-red-500/20 text-red-400'
-                                                }`}>
-                                                {request.status}
-                                            </span>
-                                        </div>
 
-                                        {/* Items List */}
-                                        {request.items && Array.isArray(request.items) && request.items.length > 0 && (
-                                            <div className="mt-3 p-3 bg-slate-900/50 rounded-lg">
-                                                <p className="text-xs font-semibold text-slate-400 mb-2">
-                                                    <i className="fa-solid fa-list mr-1"></i>
-                                                    Items Ordered:
-                                                </p>
-                                                <div className="space-y-1">
-                                                    {request.items.map((item: any, index: number) => (
-                                                        <div key={index} className="flex justify-between text-sm">
-                                                            <span className="text-slate-300">
-                                                                {item.quantity && item.quantity > 1 ? `${item.quantity}x ` : ''}
-                                                                {item.name}
-                                                            </span>
-                                                            {item.price > 0 && (
-                                                                <span className="text-slate-400 font-medium">
-                                                                    ₹{item.quantity ? item.price * item.quantity : item.price}
-                                                                </span>
-                                                            )}
+                                            {request.items && Array.isArray(request.items) && request.items.length > 0 && (
+                                                <div className="mt-2 p-3 rounded-lg space-y-1" style={nmInset}>
+                                                    <p className="text-xs font-semibold mb-1" style={{ color: 'var(--nm-text-3)' }}>
+                                                        <i className="fa-solid fa-list mr-1"></i>Items:
+                                                    </p>
+                                                    {request.items.map((item: any, i: number) => (
+                                                        <div key={i} className="flex justify-between text-xs" style={{ color: 'var(--nm-text-2)' }}>
+                                                            <span>{item.quantity && item.quantity > 1 ? `${item.quantity}× ` : ''}{item.name}</span>
+                                                            {item.price > 0 && <span className="font-medium">₹{item.quantity ? item.price * item.quantity : item.price}</span>}
                                                         </div>
                                                     ))}
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
-                                        {request.totalAmount > 0 && (
-                                            <p className="text-sm font-semibold text-cyan-400 mt-2">Total: ₹{request.totalAmount}</p>
-                                        )}
-                                        {request.specialInstructions && (
-                                            <p className="text-sm text-slate-400 mt-2">
-                                                <i className="fa-solid fa-note-sticky mr-1"></i>
-                                                {request.specialInstructions}
-                                            </p>
-                                        )}
-                                        {request.staffNotes && (
-                                            <div className="mt-2 p-3 bg-blue-900/20 border-l-4 border-blue-500 rounded">
-                                                <p className="text-xs font-semibold text-blue-400 mb-1">
-                                                    <i className="fa-solid fa-user-tie mr-1"></i>
-                                                    Staff Notes:
-                                                </p>
-                                                <p className="text-sm text-blue-300">
-                                                    {request.staffNotes}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                            {request.totalAmount > 0 && (
+                                                <p className="text-sm font-bold mt-2 text-teal-500">Total: ₹{request.totalAmount}</p>
+                                            )}
+                                            {request.staffNotes && (
+                                                <div className="mt-2 p-3 rounded-lg border-l-4 border-blue-400" style={{ background: 'rgba(219,234,254,0.5)' }}>
+                                                    <p className="text-xs font-semibold text-blue-600 mb-1"><i className="fa-solid fa-user-tie mr-1"></i>Staff Note:</p>
+                                                    <p className="text-xs text-blue-700">{request.staffNotes}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
-                {/* Room Service Items Section */}
-                <div className="mb-6 md:mb-8">
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-100 mb-3 md:mb-4 flex items-center gap-2 drop-shadow-md">
+                {/* Quick Services */}
+                <div>
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--nm-text)' }}>
                         <i className="fa-solid fa-concierge-bell text-teal-400"></i>
                         Quick Services
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
-                        {roomServiceItems.map(service => (
-                            <button
-                                key={service.name}
-                                onClick={() => toggleService(service.name)}
-                                className={`group p-4 md:p-5 rounded-2xl text-center transition-all duration-300 border backdrop-blur-md relative overflow-hidden ${selectedServices.includes(service.name)
-                                    ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/40 border-cyan-400 scale-105'
-                                    : 'glass-card-dark text-slate-300 hover:text-white hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-900/20 cursor-pointer'
-                                    }`}
-                            >
-                                <div className={`absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 transition-opacity ${!selectedServices.includes(service.name) ? 'group-hover:opacity-100' : ''}`}></div>
-                                <i className={`fa-solid ${service.icon} text-2xl md:text-3xl mb-3 transition-transform ${selectedServices.includes(service.name) ? 'scale-110' : 'group-hover:scale-110'}`}></i>
-                                <h3 className="font-semibold text-xs md:text-sm mb-1 leading-tight">{service.name}</h3>
-                                <p className={`text-xs ${selectedServices.includes(service.name) ? 'text-cyan-100' : 'text-slate-500 group-hover:text-cyan-400'}`}>
-                                    {service.price === 0 ? 'Free' : `₹${service.price}`}
-                                </p>
-                            </button>
-                        ))}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {roomServiceItems.map(service => {
+                            const selected = selectedServices.includes(service.name);
+                            return (
+                                <button
+                                    key={service.name}
+                                    onClick={() => toggleService(service.name)}
+                                    className="p-5 rounded-2xl text-center transition-all duration-200"
+                                    style={selected ? {
+                                        background: 'var(--nm-bg)',
+                                        boxShadow: 'inset 5px 5px 12px var(--nm-sd), inset -5px -5px 12px var(--nm-sl)',
+                                        borderRadius: '20px',
+                                    } : {
+                                        background: 'var(--nm-bg)',
+                                        boxShadow: '8px 8px 18px var(--nm-sd), -8px -8px 18px var(--nm-sl)',
+                                        borderRadius: '20px',
+                                    }}
+                                >
+                                    <div className={`w-12 h-12 mx-auto rounded-xl mb-3 flex items-center justify-center transition-all ${selected ? 'bg-gradient-to-br from-teal-400 to-cyan-400' : ''}`}
+                                        style={!selected ? { background: 'var(--nm-bg)', boxShadow: '4px 4px 9px var(--nm-sd), -4px -4px 9px var(--nm-sl)' } : {}}>
+                                        <i className={`fa-solid ${service.icon} text-lg ${selected ? 'text-white' : ''}`} style={!selected ? { color: 'var(--nm-text-2)' } : {}}></i>
+                                    </div>
+                                    <h3 className="font-semibold text-xs leading-tight" style={{ color: selected ? 'var(--nm-text)' : 'var(--nm-text-2)' }}>{service.name}</h3>
+                                    <p className="text-xs mt-1 font-medium text-teal-500">{service.price === 0 ? 'Free' : `₹${service.price}`}</p>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Food Menu Section */}
+                {/* Food Menu */}
                 <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-100 mb-3 md:mb-4 flex items-center gap-2 drop-shadow-md">
-                        <i className="fa-solid fa-utensils text-cyan-400"></i>
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--nm-text)' }}>
+                        <i className="fa-solid fa-utensils text-teal-400"></i>
                         Food Menu
                     </h2>
                     {loading ? (
                         <div className="text-center py-12">
-                            <i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-500 mb-4"></i>
-                            <p className="text-slate-400">Loading menu...</p>
+                            <i className="fa-solid fa-spinner fa-spin text-4xl text-teal-400 mb-4"></i>
+                            <p style={{ color: 'var(--nm-text-2)' }}>Loading menu...</p>
                         </div>
                     ) : (
-                        <div className="space-y-8 md:space-y-10">
+                        <div className="space-y-8">
                             {categories.map(category => {
                                 const items = menu.filter(item => item.category === category && item.isAvailable);
                                 if (items.length === 0) return null;
-
                                 return (
                                     <div key={category}>
-                                        <h3 className="text-lg md:text-xl font-bold text-teal-300 mb-4 capitalize px-2 border-l-4 border-teal-500">{category}</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+                                        <h3 className="text-base font-bold mb-3 capitalize px-2 border-l-4 border-teal-400" style={{ color: 'var(--nm-text)' }}>{category}</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {items.map(item => {
                                                 const cartItem = cart.find(c => c.id === item.id);
                                                 const inCart = !!cartItem;
                                                 return (
                                                     <div
                                                         key={item.id}
-                                                        className={`rounded-2xl p-5 transition-all duration-300 group relative ${inCart
-                                                            ? 'bg-cyan-950/60 ring-2 ring-cyan-500/60 shadow-lg shadow-cyan-900/30'
-                                                            : 'glass-card-dark ring-1 ring-white/5 hover:ring-cyan-500/30 hover:shadow-2xl hover:shadow-black/40'
-                                                            }`}
+                                                        className="p-5 rounded-2xl transition-all duration-200"
+                                                        style={inCart ? {
+                                                            background: 'var(--nm-bg)',
+                                                            boxShadow: 'inset 5px 5px 12px var(--nm-sd), inset -5px -5px 12px var(--nm-sl)',
+                                                            borderRadius: '20px',
+                                                        } : {
+                                                            background: 'var(--nm-bg)',
+                                                            boxShadow: '8px 8px 20px var(--nm-sd), -8px -8px 20px var(--nm-sl)',
+                                                            borderRadius: '20px',
+                                                        }}
                                                     >
-                                                        <div className="flex justify-between items-start mb-1">
+                                                        <div className="flex justify-between items-start mb-2">
                                                             <div className="flex-1 pr-3">
-                                                                <h4 className={`font-bold flex items-center gap-2 text-base md:text-lg transition-colors ${inCart ? 'text-cyan-300' : 'text-slate-100 group-hover:text-cyan-300'}`}>
+                                                                <h4 className="font-bold text-base flex items-center gap-2" style={{ color: 'var(--nm-text)' }}>
                                                                     {item.name}
                                                                     {item.isVegetarian && (
-                                                                        <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-green-500 flex items-center justify-center flex-shrink-0 rounded-sm" title="Vegetarian">
-                                                                            <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full"></span>
+                                                                        <span className="w-5 h-5 border-2 border-emerald-500 flex items-center justify-center rounded-sm flex-shrink-0" title="Vegetarian">
+                                                                            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
                                                                         </span>
                                                                     )}
                                                                 </h4>
-                                                                <p className="text-xs md:text-sm text-slate-400 line-clamp-2 mt-1">{item.description}</p>
+                                                                <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--nm-text-3)' }}>{item.description}</p>
                                                             </div>
-                                                            <span className="text-base md:text-xl font-bold text-teal-400 flex-shrink-0 drop-shadow-sm">₹{item.price}</span>
+                                                            <span className="text-lg font-bold text-teal-500 flex-shrink-0">₹{item.price}</span>
                                                         </div>
 
-                                                        {/* "In cart" badge — inline, below description */}
                                                         {inCart && (
-                                                            <span className="inline-flex items-center gap-1 mt-2 mb-1 bg-cyan-500/20 text-cyan-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-cyan-500/30">
+                                                            <span className="inline-flex items-center gap-1 mt-1 mb-2 bg-teal-100 text-teal-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-teal-200">
                                                                 <i className="fa-solid fa-check text-[10px]"></i>
                                                                 Added to order
                                                             </span>
                                                         )}
 
                                                         {inCart ? (
-                                                            /* Inline quantity controls */
-                                                            <div className="mt-3 flex items-center justify-between gap-2 bg-slate-900/50 rounded-xl p-1">
+                                                            <div className="mt-3 flex items-center justify-between gap-2 p-1 rounded-xl" style={nmInset}>
                                                                 <button
                                                                     onClick={() => updateQuantity(item.id, cartItem.quantity - 1)}
-                                                                    className="flex-1 py-2 bg-slate-700 hover:bg-red-500/40 text-white rounded-lg flex items-center justify-center transition-colors"
+                                                                    className="flex-1 py-2 rounded-lg text-white flex items-center justify-center transition-all"
+                                                                    style={{ background: 'linear-gradient(135deg, #f87171, #ef4444)', boxShadow: '2px 2px 5px var(--nm-sd)' }}
                                                                 >
                                                                     <i className="fa-solid fa-minus text-xs"></i>
                                                                 </button>
-                                                                <span className="w-10 text-center font-bold text-slate-100 text-base">
-                                                                    {cartItem.quantity}
-                                                                </span>
+                                                                <span className="w-10 text-center font-bold text-base" style={{ color: 'var(--nm-text)' }}>{cartItem.quantity}</span>
                                                                 <button
                                                                     onClick={() => updateQuantity(item.id, cartItem.quantity + 1)}
-                                                                    className="flex-1 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg flex items-center justify-center transition-colors shadow-lg shadow-cyan-900/20"
+                                                                    className="flex-1 py-2 rounded-lg text-white flex items-center justify-center transition-all"
+                                                                    style={{ background: 'linear-gradient(135deg, #2dd4bf, #06b6d4)', boxShadow: '2px 2px 5px var(--nm-sd)' }}
                                                                 >
                                                                     <i className="fa-solid fa-plus text-xs"></i>
                                                                 </button>
                                                             </div>
                                                         ) : (
-                                                            /* Add to Order button */
                                                             <button
                                                                 onClick={() => addToCart(item)}
-                                                                className="w-full mt-3 px-4 py-2.5 bg-slate-800 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-medium transition-all text-sm md:text-base border border-white/5 hover:border-transparent group-hover:shadow-lg shadow-black/20"
+                                                                className="w-full mt-3 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                                                                style={{ ...nmRaised, color: 'var(--nm-text-2)' }}
                                                             >
-                                                                <div className="flex items-center justify-center gap-2">
-                                                                    <i className="fa-solid fa-plus"></i>
-                                                                    Add to Order
-                                                                </div>
+                                                                <i className="fa-solid fa-plus text-teal-400"></i>
+                                                                Add to Order
                                                             </button>
                                                         )}
                                                     </div>
@@ -528,39 +502,36 @@ function RoomServiceContent() {
                     )}
                 </div>
 
-                {/* Cart */}
+                {/* Cart Summary */}
                 {cart.length > 0 && (
-                    <div className="mt-8 md:mt-10 glass-dark rounded-2xl p-5 md:p-6 border border-teal-500/20 shadow-xl shadow-teal-900/10">
-                        <h3 className="text-lg md:text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
+                    <div style={nmCard} className="p-6">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--nm-text)' }}>
                             <i className="fa-solid fa-cart-shopping text-teal-400"></i>
                             Your Order
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {cart.map(item => (
-                                <div key={item.id} className="flex items-center justify-between gap-3 bg-slate-800/40 p-3 rounded-xl border border-white/5">
+                                <div key={item.id} className="flex items-center justify-between gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(197,205,216,0.4)' }}>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-semibold text-slate-200 text-sm md:text-base truncate">{item.name}</p>
-                                        <p className="text-xs md:text-sm text-slate-400">₹{item.price} each</p>
+                                        <p className="font-semibold text-sm truncate" style={{ color: 'var(--nm-text)' }}>{item.name}</p>
+                                        <p className="text-xs" style={{ color: 'var(--nm-text-3)' }}>₹{item.price} each</p>
                                     </div>
-                                    <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                            className="w-8 h-8 md:w-9 md:h-9 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center text-white transition-colors"
-                                        >
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                            className="w-8 h-8 rounded-lg text-white flex items-center justify-center transition-all"
+                                            style={{ background: 'linear-gradient(135deg,#f87171,#ef4444)', boxShadow: '2px 2px 5px var(--nm-sd)' }}>
                                             <i className="fa-solid fa-minus text-xs"></i>
                                         </button>
-                                        <span className="w-6 md:w-8 text-center font-bold text-slate-100 text-sm md:text-base">{item.quantity}</span>
-                                        <button
-                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                            className="w-8 h-8 md:w-9 md:h-9 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg flex items-center justify-center transition-colors shadow-lg shadow-cyan-900/20"
-                                        >
+                                        <span className="w-7 text-center font-bold text-sm" style={{ color: 'var(--nm-text)' }}>{item.quantity}</span>
+                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                            className="w-8 h-8 rounded-lg text-white flex items-center justify-center transition-all"
+                                            style={{ background: 'linear-gradient(135deg,#2dd4bf,#06b6d4)', boxShadow: '2px 2px 5px var(--nm-sd)' }}>
                                             <i className="fa-solid fa-plus text-xs"></i>
                                         </button>
-                                        <span className="w-16 md:w-20 text-right font-bold text-teal-400 text-sm md:text-base">₹{item.price * item.quantity}</span>
-                                        <button
-                                            onClick={() => removeFromCart(item.id)}
-                                            className="w-8 h-8 md:w-9 md:h-9 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors"
-                                        >
+                                        <span className="w-14 text-right font-bold text-sm text-teal-500">₹{item.price * item.quantity}</span>
+                                        <button onClick={() => removeFromCart(item.id)}
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+                                            style={{ background: 'rgba(254,202,202,0.5)', color: '#ef4444' }}>
                                             <i className="fa-solid fa-trash text-xs"></i>
                                         </button>
                                     </div>
@@ -572,89 +543,84 @@ function RoomServiceContent() {
 
                 {/* Special Instructions */}
                 {(cart.length > 0 || selectedServices.length > 0) && (
-                    <div className="mt-4 md:mt-6 glass-dark rounded-2xl p-4 md:p-6 border border-white/5">
-                        <label className="block text-sm font-semibold text-slate-300 mb-2">
-                            Special Instructions (Optional)
+                    <div style={nmCard} className="p-6">
+                        <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--nm-text-2)' }}>
+                            <i className="fa-solid fa-note-sticky mr-2 text-teal-400"></i>
+                            Special Instructions <span className="font-normal" style={{ color: 'var(--nm-text-3)' }}>(optional)</span>
                         </label>
                         <textarea
                             value={specialInstructions}
                             onChange={(e) => setSpecialInstructions(e.target.value)}
                             placeholder="Any special requests or dietary requirements..."
-                            className="w-full px-3 py-2 md:px-4 md:py-3 bg-slate-800/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-slate-100 placeholder-slate-500 text-sm md:text-base"
                             rows={3}
+                            className="w-full px-4 py-3 text-sm"
+                            style={{ ...nmInset, color: 'var(--nm-text)', width: '100%', display: 'block' }}
                         />
                     </div>
                 )}
 
-                {/* Checking occupancy state */}
+                {/* Room status banners */}
                 {checkingOccupancy && (
-                    <div className="mt-6 flex items-center gap-3 bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
-                        <i className="fa-solid fa-spinner fa-spin text-blue-400 text-xl flex-shrink-0"></i>
+                    <div className="flex items-center gap-3 p-4 rounded-2xl" style={{ background: 'rgba(219,234,254,0.6)', border: '1px solid #93c5fd' }}>
+                        <i className="fa-solid fa-spinner fa-spin text-blue-500 text-xl flex-shrink-0"></i>
                         <div>
-                            <p className="font-semibold text-blue-300 text-sm">Checking room status...</p>
-                            <p className="text-blue-400/70 text-xs mt-0.5">This may take a moment while our server wakes up. Please wait.</p>
+                            <p className="font-semibold text-blue-700 text-sm">Checking room status...</p>
+                            <p className="text-blue-600 text-xs mt-0.5">This may take a moment. Please wait.</p>
                         </div>
                     </div>
                 )}
 
-                {/* Unoccupied room warning */}
                 {isOccupied === false && !checkingOccupancy && (
-                    <div className="mt-6 flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
-                        <i className="fa-solid fa-triangle-exclamation text-amber-400 text-xl mt-0.5 flex-shrink-0"></i>
+                    <div className="flex items-start gap-3 p-4 rounded-2xl" style={{ background: 'rgba(254,243,199,0.7)', border: '1px solid #fcd34d' }}>
+                        <i className="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-0.5 flex-shrink-0"></i>
                         <div className="flex-1">
-                            <p className="font-semibold text-amber-300 text-sm">Room Not Occupied</p>
-                            <p className="text-amber-400/80 text-xs mt-0.5">Service requests can only be placed for rooms with an active check-in. If you just checked in, please wait a moment and try again.</p>
+                            <p className="font-semibold text-amber-700 text-sm">Room Not Occupied</p>
+                            <p className="text-amber-600 text-xs mt-0.5">Service requests can only be placed for rooms with an active check-in.</p>
                             <button
                                 onClick={() => checkOccupancy()}
-                                className="mt-2 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold rounded-lg border border-amber-500/30 transition-colors"
+                                className="mt-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors"
+                                style={{ background: 'rgba(251,191,36,0.2)', color: '#92400e', border: '1px solid #fcd34d' }}
                             >
-                                <i className="fa-solid fa-rotate-right mr-1"></i>
-                                Re-check Status
+                                <i className="fa-solid fa-rotate-right mr-1"></i>Re-check Status
                             </button>
                         </div>
                     </div>
                 )}
+            </div>
 
-                {/* Submit Button */}
-                {(cart.length > 0 || selectedServices.length > 0) && (
-                    <div className="mt-4 md:mt-6 sticky bottom-0 bg-gradient-to-t from-slate-900 via-slate-900/90 to-transparent pt-6 pb-4 md:pb-0 md:static md:bg-none z-40">
+            {/* Sticky Submit Button */}
+            {(cart.length > 0 || selectedServices.length > 0) && (
+                <div className="fixed bottom-0 left-0 right-0 z-40 p-4" style={{ background: 'var(--nm-bg)', boxShadow: '0 -6px 16px var(--nm-sd)' }}>
+                    <div className="max-w-4xl mx-auto">
                         <button
                             onClick={handleSubmit}
                             disabled={submitting || isOccupied === false || checkingOccupancy}
-                            className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-800 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg shadow-cyan-900/40 transition-all text-base md:text-lg border border-white/10"
+                            className="w-full py-4 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all text-base shadow-lg"
                         >
                             {submitting ? (
-                                <>
-                                    <i className="fa-solid fa-spinner fa-spin mr-2"></i>
-                                    Submitting...
-                                </>
+                                <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Submitting...</>
                             ) : checkingOccupancy ? (
-                                <>
-                                    <i className="fa-solid fa-spinner fa-spin mr-2"></i>
-                                    Checking Room Status...
-                                </>
+                                <><i className="fa-solid fa-spinner fa-spin mr-2"></i>Checking Room Status...</>
                             ) : isOccupied === false ? (
-                                <>
-                                    <i className="fa-solid fa-ban mr-2"></i>
-                                    Room Not Occupied
-                                </>
+                                <><i className="fa-solid fa-ban mr-2"></i>Room Not Occupied</>
                             ) : (
-                                <>
-                                    <i className="fa-solid fa-paper-plane mr-2"></i>
-                                    Submit Request - ₹{calculateTotal()}
-                                </>
+                                <><i className="fa-solid fa-paper-plane mr-2"></i>Submit Request — ₹{calculateTotal()}</>
                             )}
                         </button>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
 
 export default function RoomServicePage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center"><i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-500"></i></div>}>
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--nm-bg)' }}>
+                <i className="fa-solid fa-spinner fa-spin text-4xl text-teal-400"></i>
+            </div>
+        }>
             <RoomServiceContent />
         </Suspense>
     );

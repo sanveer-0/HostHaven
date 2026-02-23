@@ -19,7 +19,6 @@ export default function LoginPage() {
 
     try {
       const data = await authAPI.login(email, password);
-      // Wait for 1 second to show the loading state
       await new Promise(resolve => setTimeout(resolve, 1000));
       setAuth(data.token, {
         _id: data._id,
@@ -35,143 +34,141 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-teal-950 text-slate-100">
+  const nmCard: React.CSSProperties = {
+    background: 'var(--nm-bg)',
+    boxShadow: '12px 12px 28px var(--nm-sd), -12px -12px 28px var(--nm-sl)',
+    borderRadius: '28px',
+  };
+  const nmInset: React.CSSProperties = {
+    background: 'var(--nm-bg)',
+    boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)',
+    borderRadius: '14px',
+    border: 'none',
+    outline: 'none',
+    color: 'var(--nm-text)',
+  };
+  const nmBtn: React.CSSProperties = {
+    background: 'var(--nm-bg)',
+    boxShadow: '5px 5px 12px var(--nm-sd), -5px -5px 12px var(--nm-sl)',
+    borderRadius: '14px',
+  };
 
-      {/* Login card */}
-      <div className="relative z-10 w-full max-w-md px-6">
-        <div className="glass-card-dark rounded-3xl shadow-2xl p-10 animate-scale-in border border-white/10">
-          {/* Logo section */}
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--nm-bg)' }}>
+      <div className="w-full max-w-md px-6">
+        <div style={nmCard} className="p-10 animate-scale-in">
+
+          {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center mb-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-lg opacity-40 animate-pulse"></div>
-                <div className="relative w-20 h-20 bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-cyan-900/40">
-                  <i className="fa-solid fa-umbrella-beach text-3xl text-white"></i>
-                </div>
+              <div
+                className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center"
+                style={{ boxShadow: '6px 6px 14px var(--nm-sd), -6px -6px 14px var(--nm-sl)' }}
+              >
+                <i className="fa-solid fa-umbrella-beach text-3xl text-white"></i>
               </div>
             </div>
-            <h1 className="text-4xl font-bold mb-2 text-white">
+            <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--nm-text)' }}>
               HostHaven
             </h1>
-            <p className="text-cyan-200/80 text-sm font-medium tracking-wide">
+            <p className="text-sm font-medium tracking-wide" style={{ color: 'var(--nm-text-3)' }}>
               🌴 Your Tropical Paradise Awaits 🌊
             </p>
           </div>
 
-          {/* Error message */}
+          {/* Error */}
           {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-slide-up">
+            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 animate-slide-up">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                  <i className="fa-solid fa-circle-exclamation text-red-400"></i>
-                </div>
-                <p className="text-red-400 text-sm font-medium">{error}</p>
+                <i className="fa-solid fa-circle-exclamation text-rose-500"></i>
+                <p className="text-rose-600 text-sm font-medium">{error}</p>
               </div>
             </div>
           )}
 
-          {/* Login form */}
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>
                 Email Address
               </label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-10 blur transition-opacity"></div>
-                <div className="relative flex items-center">
-                  <div className="absolute left-4 flex items-center pointer-events-none">
-                    <i className="fa-regular fa-envelope text-slate-500 group-focus-within:text-cyan-400 transition-colors"></i>
-                  </div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@hosthaven.com"
-                    required
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900/80 focus:ring-1 focus:ring-cyan-500/20 transition-all duration-200"
-                  />
-                </div>
+              <div className="relative flex items-center">
+                <i className="fa-regular fa-envelope absolute left-4 text-sm" style={{ color: 'var(--nm-text-3)' }}></i>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@hosthaven.com"
+                  required
+                  className="w-full pl-11 pr-4 py-3.5 text-sm placeholder-[#9ab0be] focus:ring-2 focus:ring-teal-300/50"
+                  style={nmInset}
+                />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>
                 Password
               </label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-10 blur transition-opacity"></div>
-                <div className="relative flex items-center">
-                  <div className="absolute left-4 flex items-center pointer-events-none">
-                    <i className="fa-solid fa-lock text-slate-500 group-focus-within:text-cyan-400 transition-colors"></i>
-                  </div>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900/80 focus:ring-1 focus:ring-cyan-500/20 transition-all duration-200"
-                  />
-                </div>
+              <div className="relative flex items-center">
+                <i className="fa-solid fa-lock absolute left-4 text-sm" style={{ color: 'var(--nm-text-3)' }}></i>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full pl-11 pr-4 py-3.5 text-sm placeholder-[#9ab0be] focus:ring-2 focus:ring-teal-300/50"
+                  style={nmInset}
+                />
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="relative w-full group mt-6"
+              className="w-full mt-6 py-4 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white font-bold rounded-2xl transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              style={{ boxShadow: '5px 5px 14px var(--nm-sd), -5px -5px 14px var(--nm-sl)' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 rounded-xl blur opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative w-full py-4 bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 hover:from-teal-500 hover:via-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl transition-all duration-200 transform group-hover:translate-y-[-1px] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 shadow-lg shadow-cyan-900/20">
-                {loading ? (
-                  <>
-                    <i className="fa-solid fa-spinner fa-spin text-lg"></i>
-                    <span>Signing in...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Dive Into Dashboard</span>
-                    <i className="fa-solid fa-water group-hover:translate-x-1 transition-transform"></i>
-                  </>
-                )}
-              </div>
+              {loading ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Dive Into Dashboard</span>
+                  <i className="fa-solid fa-water"></i>
+                </>
+              )}
             </button>
           </form>
 
           {/* Credentials hint */}
-          <div className="mt-8 p-4 bg-cyan-900/20 border border-cyan-500/20 rounded-xl backdrop-blur-sm">
+          <div className="mt-8 p-4 rounded-xl" style={{ boxShadow: 'inset 3px 3px 8px var(--nm-sd), inset -3px -3px 8px var(--nm-sl)', background: 'var(--nm-bg)' }}>
             <div className="flex items-start gap-3">
-              <div className="mt-1">
-                <i className="fa-solid fa-circle-info text-cyan-400"></i>
-              </div>
-              <div className="text-xs text-cyan-200/80">
-                <p className="font-semibold mb-2 text-cyan-100">Demo Credentials:</p>
+              <i className="fa-solid fa-circle-info text-teal-500 mt-0.5"></i>
+              <div className="text-xs" style={{ color: 'var(--nm-text-2)' }}>
+                <p className="font-semibold mb-2" style={{ color: 'var(--nm-text)' }}>Demo Credentials:</p>
                 <div className="space-y-1 font-mono">
-                  <p>Email: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">admin@hosthaven.com</span></p>
-                  <p>Password: <span className="bg-slate-900/50 px-2 py-0.5 rounded text-cyan-300 border border-cyan-500/10">admin123</span></p>
+                  <p>Email: <span className="text-teal-600 font-semibold">admin@hosthaven.com</span></p>
+                  <p>Password: <span className="text-teal-600 font-semibold">admin123</span></p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-white/5">
-            <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-              <i className="fa-solid fa-shield-halved text-cyan-600"></i>
+          <div className="mt-8 pt-6 text-center" style={{ borderTop: '1px solid rgba(197,205,216,0.5)' }}>
+            <div className="flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--nm-text-3)' }}>
+              <i className="fa-solid fa-shield-halved text-teal-400"></i>
               <span>Secured with JWT Authentication</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom text */}
-        <p className="text-center mt-6 text-sm text-slate-500">
+        <p className="text-center mt-6 text-sm" style={{ color: 'var(--nm-text-3)' }}>
           © 2026 HostHaven. Making waves in hospitality 🌊
-        </p>
-
-        {/* Debug Info */}
-        <p className="text-center mt-2 text-xs text-slate-600 font-mono">
-          Connecting to: {API_URL}
         </p>
       </div>
     </div>

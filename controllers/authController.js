@@ -2,10 +2,15 @@ const { User } = require('../models');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 
+// Fail fast if JWT_SECRET is not configured
+if (!process.env.JWT_SECRET) {
+    throw new Error('[Auth] JWT_SECRET is not set in environment variables. Add it to your .env file.');
+}
+
 // Generate JWT Token
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE
+        expiresIn: process.env.JWT_EXPIRE || '30d'
     });
 };
 
@@ -73,7 +78,14 @@ const login = async (req, res) => {
             res.status(401).json({ message: 'Invalid email or password' });
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error('[Login Error]', error.message);
+        // Don't expose internal JWT/env errors to the client
+        const isInternalError = error.message.includes('secretOrPrivateKey') || error.message.includes('JWT');
+        res.status(500).json({
+            message: isInternalError
+                ? 'Server configuration error. Please contact the administrator.'
+                : error.message
+        });
     }
 };
 

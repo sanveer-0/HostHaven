@@ -174,13 +174,13 @@ export default function RoomsPage() {
     const getRoomStatusColor = (status: string) => {
         switch (status) {
             case 'available':
-                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                return 'bg-emerald-100 text-emerald-700 border-emerald-200';
             case 'occupied':
-                return 'bg-red-500/20 text-red-400 border-red-500/30';
+                return 'bg-rose-100 text-rose-700 border-rose-200';
             case 'maintenance':
-                return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                return 'bg-amber-100 text-amber-700 border-amber-200';
             default:
-                return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+                return 'bg-slate-100 text-slate-600 border-slate-200';
         }
     };
 
@@ -198,15 +198,16 @@ export default function RoomsPage() {
 
     return (
         <>
-            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
+            <header className="px-8 py-6 bg-transparent" style={{ borderBottom: '1px solid var(--nm-border)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">Room Management</h2>
-                        <p className="text-slate-300">Manage all your rooms and their availability 🏨</p>
+                        <h2 className="text-3xl font-bold mb-1" style={{ color: 'var(--nm-text)' }}>Room Management</h2>
+                        <p style={{ color: 'var(--nm-text-2)' }}>Manage all your rooms and their availability 🏨</p>
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-semibold rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg shadow-cyan-500/20 flex items-center gap-2"
+                        className="px-5 py-2.5 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                        style={{ boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)' }}
                     >
                         <i className="fa-solid fa-plus"></i>
                         <span>Add Room</span>
@@ -218,8 +219,8 @@ export default function RoomsPage() {
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
                         <div className="text-center">
-                            <i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-400 mb-4"></i>
-                            <p className="text-slate-400">Loading rooms...</p>
+                            <i className="fa-solid fa-spinner fa-spin text-4xl text-teal-400 mb-4"></i>
+                            <p style={{ color: 'var(--nm-text-2)' }}>Loading rooms...</p>
                         </div>
                     </div>
                 ) : (
@@ -227,19 +228,19 @@ export default function RoomsPage() {
                         {rooms.map((room, index) => (
                             <div
                                 key={room.id}
-                                className="glass-card-dark p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 animate-slide-up relative overflow-hidden group"
-                                style={{ animationDelay: `${index * 50}ms` }}
+                                className="p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 animate-slide-up relative overflow-hidden group"
+                                style={{ background: 'var(--nm-bg)', boxShadow: '8px 8px 18px var(--nm-sd), -8px -8px 18px var(--nm-sl)', animationDelay: `${index * 50}ms` }}
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/5 to-transparent rounded-bl-full -mr-8 -mt-8 pointer-events-none"></div>
+                                <div className="absolute top-0 right-0 w-32 h-32 rounded-bl-full -mr-8 -mt-8 pointer-events-none" style={{ background: 'var(--nm-surface)' }}></div>
 
                                 <div className="flex justify-between items-start mb-4 relative z-10">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-900/40">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-md">
                                             <i className={`fa-solid ${getRoomIcon(room.type)} text-white text-lg`}></i>
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-bold text-slate-100">{room.roomNumber}</h3>
-                                            <p className="text-sm text-slate-400 capitalize">{room.type}</p>
+                                            <h3 className="text-xl font-bold" style={{ color: 'var(--nm-text)' }}>{room.roomNumber}</h3>
+                                            <p className="text-sm capitalize" style={{ color: 'var(--nm-text-3)' }}>{room.type}</p>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${getRoomStatusColor(room.status)}`}>
@@ -249,17 +250,17 @@ export default function RoomsPage() {
 
                                 <div className="space-y-3 mb-4 relative z-10">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-400">Price/Night</span>
-                                        <span className="text-slate-200 font-semibold">₹{room.pricePerNight}</span>
+                                        <span style={{ color: 'var(--nm-text-3)' }}>Price/Night</span>
+                                        <span className="font-semibold" style={{ color: 'var(--nm-text)' }}>₹{room.pricePerNight}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-400">Capacity</span>
-                                        <span className="text-slate-200 font-semibold">{room.capacity} guests</span>
+                                        <span style={{ color: 'var(--nm-text-3)' }}>Capacity</span>
+                                        <span className="font-semibold" style={{ color: 'var(--nm-text)' }}>{room.capacity} guests</span>
                                     </div>
                                 </div>
 
-                                <div className="h-1.5 w-full rounded-full bg-slate-700 mb-5 overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 w-full animate-pulse"></div>
+                                <div className="h-1.5 w-full rounded-full mb-5 overflow-hidden" style={{ background: 'var(--nm-border)' }}>
+                                    <div className="h-full bg-gradient-to-r from-teal-400 to-cyan-400 w-full"></div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2 relative z-10 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -269,7 +270,8 @@ export default function RoomsPage() {
                                                 e.stopPropagation();
                                                 handleRoomClick(room);
                                             }}
-                                            className="col-span-2 px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                            className="col-span-2 px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                            style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.25)', color: '#9333ea' }}
                                         >
                                             <i className="fa-solid fa-users"></i>
                                             View Guests
@@ -280,7 +282,8 @@ export default function RoomsPage() {
                                             e.stopPropagation();
                                             handleViewQR(room);
                                         }}
-                                        className="px-4 py-2.5 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        className="px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        style={{ background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.2)', color: '#0891b2' }}
                                     >
                                         <i className="fa-solid fa-qrcode"></i>
                                         QR
@@ -290,7 +293,8 @@ export default function RoomsPage() {
                                             e.stopPropagation();
                                             handleOpenGuestInterface(room);
                                         }}
-                                        className="px-4 py-2.5 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        className="px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        style={{ background: 'rgba(20,184,166,0.1)', border: '1px solid rgba(20,184,166,0.2)', color: '#0d9488' }}
                                     >
                                         <i className="fa-solid fa-external-link-alt"></i>
                                         View
@@ -300,7 +304,8 @@ export default function RoomsPage() {
                                             e.stopPropagation();
                                             openEditModal(room);
                                         }}
-                                        className="px-4 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        className="px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#2563eb' }}
                                     >
                                         <i className="fa-solid fa-pen"></i>
                                         Edit
@@ -310,7 +315,8 @@ export default function RoomsPage() {
                                             e.stopPropagation();
                                             handleDelete(room.id);
                                         }}
-                                        className="px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        className="px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                                        style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', color: '#e11d48' }}
                                     >
                                         <i className="fa-solid fa-trash"></i>
                                         Del
@@ -324,45 +330,47 @@ export default function RoomsPage() {
 
             {/* Create/Edit Room Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass-dark border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
+                <div className="fixed inset-0 bg-[rgba(150,160,175,0.4)] backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in" style={{ background: 'var(--nm-bg)', boxShadow: '12px 12px 28px var(--nm-sd), -12px -12px 28px var(--nm-sl)' }}>
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-slate-100">
+                            <h3 className="text-2xl font-bold" style={{ color: 'var(--nm-text)' }}>
                                 {editingRoom ? 'Edit Room' : 'Add New Room'}
                             </h3>
-                            <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 flex items-center justify-center transition-colors">
+                            <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" style={{ background: 'var(--nm-bg)', boxShadow: '3px 3px 7px var(--nm-sd), -3px -3px 7px var(--nm-sl)', color: 'var(--nm-text-2)' }}>
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-slate-300 mb-2">Room Number</label>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Room Number</label>
                                 <input
                                     type="text"
                                     value={formData.roomNumber}
                                     onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
                                     required
                                     placeholder="101"
-                                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                                    className="w-full px-4 py-3"
+                                    style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-300 mb-2">Room Type</label>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Room Type</label>
                                 <select
                                     value={formData.type}
                                     onChange={(e) => setFormData({ ...formData, type: e.target.value as Room['type'] })}
-                                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all appearance-none"
+                                    className="w-full px-4 py-3"
+                                    style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                 >
-                                    <option value="single" className="bg-slate-800">Single</option>
-                                    <option value="double" className="bg-slate-800">Double</option>
-                                    <option value="deluxe" className="bg-slate-800">Deluxe</option>
+                                    <option value="single">Single</option>
+                                    <option value="double">Double</option>
+                                    <option value="deluxe">Deluxe</option>
                                     <option value="suite" className="bg-slate-800">Suite</option>
                                     <option value="family" className="bg-slate-800">Family</option>
                                 </select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Price/Night</label>
+                                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Price/Night</label>
                                     <input
                                         type="number"
                                         min="0"
@@ -371,11 +379,12 @@ export default function RoomsPage() {
                                         onChange={(e) => setFormData({ ...formData, pricePerNight: e.target.value })}
                                         required
                                         placeholder="100"
-                                        className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                                        className="w-full px-4 py-3"
+                                        style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Capacity</label>
+                                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Capacity</label>
                                     <input
                                         type="number"
                                         min="1"
@@ -383,33 +392,36 @@ export default function RoomsPage() {
                                         onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
                                         required
                                         placeholder="2"
-                                        className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                                        className="w-full px-4 py-3"
+                                        style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-300 mb-2">Status</label>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Status</label>
                                 <select
                                     value={formData.status}
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value as Room['status'] })}
-                                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all appearance-none"
+                                    className="w-full px-4 py-3"
+                                    style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                 >
-                                    <option value="available" className="bg-slate-800">Available</option>
-                                    <option value="occupied" className="bg-slate-800">Occupied</option>
-                                    <option value="maintenance" className="bg-slate-800">Maintenance</option>
+                                    <option value="available">Available</option>
+                                    <option value="occupied">Occupied</option>
+                                    <option value="maintenance">Maintenance</option>
                                 </select>
                             </div>
                             <div className="flex gap-3 pt-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all"
+                                    className="flex-1 px-4 py-3 font-semibold rounded-xl transition-all"
+                                    style={{ background: 'var(--nm-bg)', boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)', color: 'var(--nm-text-2)' }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all shadow-lg"
                                 >
                                     {editingRoom ? 'Update Room' : 'Add Room'}
                                 </button>
@@ -421,16 +433,17 @@ export default function RoomsPage() {
 
             {/* Guest List Modal for Occupied Rooms */}
             {showGuestListModal && selectedRoom && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass-dark border border-white/10 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in">
+                <div className="fixed inset-0 bg-[rgba(150,160,175,0.4)] backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 animate-scale-in" style={{ background: 'var(--nm-bg)', boxShadow: '12px 12px 28px var(--nm-sd), -12px -12px 28px var(--nm-sl)' }}>
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="text-2xl font-bold text-slate-100">Room {selectedRoom.roomNumber} - Guests</h3>
-                                <p className="text-sm text-slate-400 mt-1">Current occupants and booking details</p>
+                                <h3 className="text-2xl font-bold" style={{ color: 'var(--nm-text)' }}>Room {selectedRoom.roomNumber} - Guests</h3>
+                                <p className="text-sm mt-1" style={{ color: 'var(--nm-text-3)' }}>Current occupants and booking details</p>
                             </div>
                             <button
                                 onClick={() => setShowGuestListModal(false)}
-                                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 flex items-center justify-center transition-colors"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                                style={{ background: 'var(--nm-bg)', boxShadow: '3px 3px 7px var(--nm-sd), -3px -3px 7px var(--nm-sl)', color: 'var(--nm-text-2)' }}
                             >
                                 <i className="fa-solid fa-times"></i>
                             </button>
@@ -439,48 +452,48 @@ export default function RoomsPage() {
                         {loadingBookings ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
-                                    <i className="fa-solid fa-spinner fa-spin text-4xl text-cyan-400 mb-4"></i>
-                                    <p className="text-slate-400">Loading guest information...</p>
+                                    <i className="fa-solid fa-spinner fa-spin text-4xl text-teal-400 mb-4"></i>
+                                    <p style={{ color: 'var(--nm-text-2)' }}>Loading guest information...</p>
                                 </div>
                             </div>
                         ) : roomBookings.length > 0 ? (
                             <div className="space-y-4">
                                 {roomBookings.map((booking, index) => (
-                                    <div key={booking.id} className="bg-slate-800/40 p-5 rounded-xl border border-white/5">
+                                    <div key={booking.id} className="p-5 rounded-xl" style={{ background: 'var(--nm-surface)', border: '1px solid var(--nm-border)' }}>
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-teal-400 flex items-center justify-center text-white font-bold text-lg shadow-md">
                                                     {booking.guest?.name?.[0] || 'G'}
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-lg font-bold text-slate-100">{booking.guest?.name || 'Unknown Guest'}</h4>
-                                                    <p className="text-sm text-slate-400">{booking.guest?.email || 'No email'}</p>
+                                                    <h4 className="text-lg font-bold" style={{ color: 'var(--nm-text)' }}>{booking.guest?.name || 'Unknown Guest'}</h4>
+                                                    <p className="text-sm" style={{ color: 'var(--nm-text-3)' }}>{booking.guest?.email || 'No email'}</p>
                                                 </div>
                                             </div>
-                                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase ${booking.bookingStatus === 'checked-in' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                                                booking.bookingStatus === 'confirmed' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                                                    'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase border ${booking.bookingStatus === 'checked-in' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                                booking.bookingStatus === 'confirmed' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                                                    'bg-slate-100 text-slate-600 border-slate-200'
                                                 }`}>
                                                 {booking.bookingStatus}
                                             </span>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 mb-4">
-                                            <div className="bg-white/5 p-3 rounded-lg">
-                                                <p className="text-xs text-slate-400 mb-1">Phone</p>
-                                                <p className="text-sm font-semibold text-slate-200">{booking.guest?.phone || 'N/A'}</p>
+                                            <div className="p-3 rounded-lg" style={{ background: 'var(--nm-border)' }}>
+                                                <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Phone</p>
+                                                <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{booking.guest?.phone || 'N/A'}</p>
                                             </div>
-                                            <div className="bg-white/5 p-3 rounded-lg">
-                                                <p className="text-xs text-slate-400 mb-1">Address</p>
-                                                <p className="text-sm font-semibold text-slate-200">{booking.guest?.address || 'N/A'}</p>
+                                            <div className="p-3 rounded-lg" style={{ background: 'var(--nm-border)' }}>
+                                                <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Address</p>
+                                                <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{booking.guest?.address || 'N/A'}</p>
                                             </div>
-                                            <div className="bg-white/5 p-3 rounded-lg">
-                                                <p className="text-xs text-slate-400 mb-1">ID Type</p>
-                                                <p className="text-sm font-semibold text-slate-200 capitalize">{booking.guest?.idProofType?.replace('_', ' ') || 'N/A'}</p>
+                                            <div className="p-3 rounded-lg" style={{ background: 'var(--nm-border)' }}>
+                                                <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>ID Type</p>
+                                                <p className="text-sm font-semibold capitalize" style={{ color: 'var(--nm-text)' }}>{booking.guest?.idProofType?.replace('_', ' ') || 'N/A'}</p>
                                             </div>
-                                            <div className="bg-white/5 p-3 rounded-lg">
-                                                <p className="text-xs text-slate-400 mb-1">ID Number</p>
-                                                <p className="text-sm font-semibold text-slate-200">{booking.guest?.idProofNumber || 'N/A'}</p>
+                                            <div className="p-3 rounded-lg" style={{ background: 'var(--nm-border)' }}>
+                                                <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>ID Number</p>
+                                                <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{booking.guest?.idProofNumber || 'N/A'}</p>
                                             </div>
                                         </div>
 
@@ -489,17 +502,17 @@ export default function RoomsPage() {
                                             const sg: any[] = (booking.guest as any)?.secondaryGuests || [];
                                             return sg.length > 0 ? (
                                                 <div className="mb-4">
-                                                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-2">
+                                                    <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: 'var(--nm-text-3)' }}>
                                                         <i className="fa-solid fa-users mr-1"></i> Additional Guests
                                                     </p>
                                                     <div className="space-y-2">
                                                         {sg.map((g: any, i: number) => (
-                                                            <div key={i} className="flex items-center gap-3 bg-white/5 px-3 py-2 rounded-lg">
-                                                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                                                            <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg" style={{ background: 'var(--nm-border)' }}>
+                                                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold">
                                                                     {g.name?.[0] || '?'}
                                                                 </div>
-                                                                <span className="text-sm text-slate-200 font-medium">{g.name || 'Unknown'}</span>
-                                                                {g.age && <span className="text-xs text-slate-400 ml-auto">Age {g.age}</span>}
+                                                                <span className="text-sm font-medium" style={{ color: 'var(--nm-text)' }}>{g.name || 'Unknown'}</span>
+                                                                {g.age && <span className="text-xs ml-auto" style={{ color: 'var(--nm-text-3)' }}>Age {g.age}</span>}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -507,36 +520,36 @@ export default function RoomsPage() {
                                             ) : null;
                                         })()}
 
-                                        <div className="border-t border-white/5 pt-4 mt-4">
+                                        <div className="pt-4 mt-4" style={{ borderTop: '1px solid var(--nm-border)' }}>
                                             <div className="grid grid-cols-4 gap-3">
                                                 <div>
-                                                    <p className="text-xs text-slate-400 mb-1">Check-In</p>
-                                                    <p className="text-sm font-semibold text-slate-200">{new Date(booking.checkInDate).toLocaleDateString()}</p>
+                                                    <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Check-In</p>
+                                                    <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{new Date(booking.checkInDate).toLocaleDateString()}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 mb-1">Check-Out</p>
-                                                    <p className="text-sm font-semibold text-slate-200">{new Date(booking.checkOutDate).toLocaleDateString()}</p>
+                                                    <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Check-Out</p>
+                                                    <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{new Date(booking.checkOutDate).toLocaleDateString()}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 mb-1">Guests</p>
-                                                    <p className="text-sm font-semibold text-slate-200">{booking.numberOfGuests}</p>
+                                                    <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Guests</p>
+                                                    <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>{booking.numberOfGuests}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400 mb-1">Total Amount</p>
-                                                    <p className="text-sm font-semibold text-slate-200">₹{booking.totalAmount}</p>
+                                                    <p className="text-xs mb-1" style={{ color: 'var(--nm-text-3)' }}>Total Amount</p>
+                                                    <p className="text-sm font-semibold" style={{ color: 'var(--nm-text)' }}>₹{booking.totalAmount}</p>
                                                 </div>
                                             </div>
                                             <div className="mt-3 flex items-center justify-between">
-                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${booking.paymentStatus === 'paid' ? 'bg-green-500/20 text-green-400' :
-                                                    booking.paymentStatus === 'partial' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                        'bg-red-500/20 text-red-400'
+                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase border ${booking.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                                                    booking.paymentStatus === 'partial' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                                        'bg-rose-100 text-rose-700 border-rose-200'
                                                     }`}>
                                                     Payment: {booking.paymentStatus}
                                                 </span>
                                                 {booking.bookingStatus === 'checked-in' && (
                                                     <button
                                                         onClick={() => handleCheckout(booking.id)}
-                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-semibold rounded-lg transition-all shadow-md"
+                                                        className="px-4 py-2 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold rounded-lg transition-all shadow-md"
                                                     >
                                                         <i className="fa-solid fa-right-from-bracket mr-2"></i>
                                                         Checkout
@@ -549,16 +562,16 @@ export default function RoomsPage() {
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <i className="fa-solid fa-users-slash text-5xl text-slate-600 mb-4"></i>
-                                <p className="text-slate-400 text-lg">No active bookings found for this room</p>
-                                <p className="text-slate-500 text-sm mt-2">The room may be marked as occupied but has no current guests</p>
+                                <i className="fa-solid fa-users-slash text-5xl mb-4" style={{ color: 'var(--nm-text-3)' }}></i>
+                                <p className="text-lg" style={{ color: 'var(--nm-text-2)' }}>No active bookings found for this room</p>
+                                <p className="text-sm mt-2" style={{ color: 'var(--nm-text-3)' }}>The room may be marked as occupied but has no current guests</p>
                             </div>
                         )}
 
                         <div className="mt-6">
                             <button
                                 onClick={() => setShowGuestListModal(false)}
-                                className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                className="w-full px-4 py-3 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all shadow-lg"
                             >
                                 Close
                             </button>
@@ -569,19 +582,19 @@ export default function RoomsPage() {
 
             {/* QR Code Modal */}
             {showQRModal && selectedRoomForQR && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass-dark border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale-in">
+                <div className="fixed inset-0 bg-[rgba(150,160,175,0.4)] backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale-in" style={{ background: 'var(--nm-bg)', boxShadow: '12px 12px 28px var(--nm-sd), -12px -12px 28px var(--nm-sl)' }}>
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-2xl font-bold text-slate-100">
+                            <h3 className="text-2xl font-bold" style={{ color: 'var(--nm-text)' }}>
                                 Room {selectedRoomForQR.roomNumber} - QR Code
                             </h3>
-                            <button onClick={() => setShowQRModal(false)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 flex items-center justify-center transition-colors">
+                            <button onClick={() => setShowQRModal(false)} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" style={{ background: 'var(--nm-bg)', boxShadow: '3px 3px 7px var(--nm-sd), -3px -3px 7px var(--nm-sl)', color: 'var(--nm-text-2)' }}>
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
 
                         <div className="text-center">
-                            <div className="bg-white p-6 rounded-xl border-4 border-cyan-500 inline-block mb-4 shadow-lg shadow-cyan-500/20">
+                            <div className="bg-white p-6 rounded-xl border-4 border-teal-400 inline-block mb-4 shadow-lg" style={{ boxShadow: '6px 6px 16px var(--nm-sd), -6px -6px 16px var(--nm-sl)' }}>
                                 <QRCodeCanvas
                                     ref={qrCanvasRef}
                                     value={qrCodeData}
@@ -591,24 +604,25 @@ export default function RoomsPage() {
                                 />
                             </div>
 
-                            <p className="text-sm text-slate-300 mb-2">
+                            <p className="text-sm mb-2" style={{ color: 'var(--nm-text-2)' }}>
                                 Guests can scan this QR code to access room service
                             </p>
-                            <p className="text-xs text-slate-500 mb-6">
+                            <p className="text-xs mb-6" style={{ color: 'var(--nm-text-3)' }}>
                                 Print and place this QR code inside the room
                             </p>
 
                             <div className="flex gap-3">
                                 <button
                                     onClick={handleDownloadQR}
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-xl transition-all shadow-lg"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all shadow-lg"
                                 >
                                     <i className="fa-solid fa-download mr-2"></i>
                                     Download
                                 </button>
                                 <button
                                     onClick={() => setShowQRModal(false)}
-                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all"
+                                    className="flex-1 px-4 py-3 font-semibold rounded-xl transition-all"
+                                    style={{ background: 'var(--nm-bg)', boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)', color: 'var(--nm-text-2)' }}
                                 >
                                     Close
                                 </button>

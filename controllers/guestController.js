@@ -37,6 +37,11 @@ const createGuest = async (req, res) => {
         const guest = await Guest.create(req.body);
         res.status(201).json(guest);
     } catch (error) {
+        // Extract specific Sequelize validation messages
+        if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+            const messages = error.errors.map(e => e.message);
+            return res.status(400).json({ message: messages.join('. '), fields: error.errors.map(e => ({ field: e.path, message: e.message })) });
+        }
         res.status(400).json({ message: error.message });
     }
 };

@@ -18,7 +18,15 @@ const Guest = sequelize.define('Guest', {
         type: DataTypes.STRING(255),
         allowNull: true,
         validate: {
-            isEmail: { msg: 'Please add a valid email' }
+            isValidEmail(value) {
+                // Only validate format when an email is actually provided
+                if (value !== null && value !== undefined && value.trim() !== '') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        throw new Error('Please add a valid email address');
+                    }
+                }
+            }
         }
     },
     phone: {

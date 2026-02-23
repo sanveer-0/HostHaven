@@ -34,7 +34,7 @@ export default function DashboardLayout({
 
     return (
         <NotificationProvider>
-            <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 overflow-hidden relative text-slate-100">
+            <div className="flex h-screen overflow-hidden relative text-[#3d5263]" style={{ background: 'var(--nm-bg)' }}>
 
                 {/* Sidebar */}
                 <Sidebar user={user} handleLogout={handleLogout} />

@@ -181,71 +181,74 @@ export default function PaymentsPage() {
 
     return (
         <>
-            <header className="px-8 py-6 border-b border-white/5 bg-transparent">
+            <header className="px-8 py-6 bg-transparent" style={{ borderBottom: '1px solid var(--nm-border)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-100 mb-1 drop-shadow-lg">Payment Records</h2>
-                        <p className="text-slate-300">Track all financial transactions 💳 Click on pending payments to complete them</p>
+                        <h2 className="text-3xl font-bold mb-1" style={{ color: 'var(--nm-text)' }}>Payment Records</h2>
+                        <p style={{ color: 'var(--nm-text-2)' }}>Track all financial transactions 💳 Click on pending payments to complete them</p>
                     </div>
                 </div>
             </header>
 
             <div className="flex-1 overflow-y-auto p-8">
-                <div className="glass-card-dark rounded-2xl overflow-hidden shadow-lg animate-fade-in border border-white/5">
+                <div className="rounded-2xl overflow-hidden animate-fade-in" style={{ background: 'var(--nm-bg)', boxShadow: '8px 8px 18px var(--nm-sd), -8px -8px 18px var(--nm-sl)' }}>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-slate-800/50 border-b border-white/5">
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Guest</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Booking Ref</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Method</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                                <tr style={{ borderBottom: '1px solid var(--nm-border)' }}>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Date</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Guest</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Booking Ref</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Amount</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Method</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Status</th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--nm-text-3)' }}>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody>
                                 {loading ? (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-12 text-center">
                                             <i className="fa-solid fa-spinner fa-spin text-3xl text-cyan-400 mb-3"></i>
-                                            <p className="text-slate-400">Loading payments...</p>
+                                            <p style={{ color: 'var(--nm-text-2)' }}>Loading payments...</p>
                                         </td>
                                     </tr>
                                 ) : payments.length > 0 ? (
                                     payments.map((payment) => (
                                         <tr
                                             key={payment.id}
-                                            className="hover:bg-white/5 transition-colors group"
+                                            className="transition-colors"
+                                            style={{ borderBottom: '1px solid var(--nm-border)' }}
+                                            onMouseEnter={e => (e.currentTarget.style.background = 'var(--nm-surface)')}
+                                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                                         >
-                                            <td className="px-6 py-4 text-slate-300">{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4" style={{ color: 'var(--nm-text-2)' }}>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
                                                 <div>
-                                                    <p className="text-sm font-medium text-slate-200">{(payment.booking as any)?.guest?.name || 'Unknown'}</p>
-                                                    <p className="text-xs text-slate-500">Room {(payment.booking as any)?.room?.roomNumber || 'N/A'}</p>
+                                                    <p className="text-sm font-medium" style={{ color: 'var(--nm-text)' }}>{(payment.booking as any)?.guest?.name || 'Unknown'}</p>
+                                                    <p className="text-xs" style={{ color: 'var(--nm-text-3)' }}>Room {(payment.booking as any)?.room?.roomNumber || 'N/A'}</p>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm font-mono border border-white/10">
+                                                <span className="px-3 py-1 rounded-lg text-sm font-mono" style={{ background: 'var(--nm-border)', color: 'var(--nm-text-2)' }}>
                                                     #{payment.bookingId}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-emerald-400 font-bold text-lg">₹{payment.amount}</span>
+                                                <span className="text-emerald-600 font-bold text-lg">₹{payment.amount}</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
-                                                        <i className={`fa-solid ${getPaymentMethodIcon(payment.paymentMethod)} text-slate-400 text-sm`}></i>
+                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--nm-border)' }}>
+                                                        <i className={`fa-solid ${getPaymentMethodIcon(payment.paymentMethod)} text-sm`} style={{ color: 'var(--nm-text-2)' }}></i>
                                                     </div>
-                                                    <span className="text-slate-300 capitalize">{payment.paymentMethod === 'pending' ? 'Not Set' : payment.paymentMethod.replace('_', ' ')}</span>
+                                                    <span className="capitalize" style={{ color: 'var(--nm-text-2)' }}>{payment.paymentMethod === 'pending' ? 'Not Set' : payment.paymentMethod.replace('_', ' ')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${payment.status === 'pending'
-                                                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                                                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                                                    ? 'bg-amber-100 text-amber-700 border-amber-200'
+                                                    : 'bg-emerald-100 text-emerald-700 border-emerald-200'
                                                     }`}>{payment.status}</span>
                                             </td>
                                             <td className="px-6 py-4">
@@ -293,48 +296,50 @@ export default function PaymentsPage() {
 
             {/* Complete Payment Modal */}
             {showModal && selectedPayment && (
-                <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass-card-dark rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in border border-white/10">
-                        <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-                            <h3 className="text-2xl font-bold text-slate-100">Complete Payment</h3>
-                            <button onClick={() => { setShowModal(false); setSelectedPayment(null); }} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 flex items-center justify-center transition-colors">
+                <div className="fixed inset-0 bg-[rgba(150,160,175,0.4)] backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in" style={{ background: 'var(--nm-bg)', boxShadow: '12px 12px 28px var(--nm-sd), -12px -12px 28px var(--nm-sl)' }}>
+                        <div className="flex items-center justify-between mb-6 pb-4" style={{ borderBottom: '1px solid var(--nm-border)' }}>
+                            <h3 className="text-2xl font-bold" style={{ color: 'var(--nm-text)' }}>Complete Payment</h3>
+                            <button onClick={() => { setShowModal(false); setSelectedPayment(null); }} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" style={{ background: 'var(--nm-bg)', boxShadow: '3px 3px 7px var(--nm-sd), -3px -3px 7px var(--nm-sl)', color: 'var(--nm-text-2)' }}>
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
                         <div className="space-y-4">
-                            <div className="bg-blue-900/20 p-4 rounded-xl border border-blue-500/20">
-                                <p className="text-sm text-blue-300 mb-1">Booking Reference</p>
-                                <p className="text-lg font-bold text-blue-100">#{selectedPayment.bookingId}</p>
+                            <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                                <p className="text-sm text-blue-600 mb-1">Booking Reference</p>
+                                <p className="text-lg font-bold text-blue-700">#{selectedPayment.bookingId}</p>
                             </div>
-                            <div className="bg-emerald-900/20 p-4 rounded-xl border border-emerald-500/20">
-                                <p className="text-sm text-emerald-300 mb-1">Amount to Pay</p>
-                                <p className="text-2xl font-bold text-emerald-400">₹{selectedPayment.amount}</p>
+                            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                                <p className="text-sm text-emerald-600 mb-1">Amount to Pay</p>
+                                <p className="text-2xl font-bold text-emerald-600">₹{selectedPayment.amount}</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-400 mb-2">Payment Method</label>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--nm-text-2)' }}>Payment Method</label>
                                 <select
                                     value={paymentMethod}
                                     onChange={(e) => setPaymentMethod(e.target.value as Payment['paymentMethod'])}
-                                    className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50"
+                                    className="w-full px-4 py-3"
+                                    style={{ boxShadow: 'inset 4px 4px 9px var(--nm-sd), inset -4px -4px 9px var(--nm-sl)', background: 'var(--nm-bg)', borderRadius: '12px', border: 'none', color: 'var(--nm-text)', outline: 'none' }}
                                 >
-                                    <option value="cash" className="bg-slate-800">Cash</option>
-                                    <option value="card" className="bg-slate-800">Credit/Debit Card</option>
-                                    <option value="upi" className="bg-slate-800">UPI</option>
-                                    <option value="bank_transfer" className="bg-slate-800">Bank Transfer</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="card">Credit/Debit Card</option>
+                                    <option value="upi">UPI</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
                                 </select>
                             </div>
-                            <div className="flex gap-3 pt-4 border-t border-white/10">
+                            <div className="flex gap-3 pt-4" style={{ borderTop: '1px solid var(--nm-border)' }}>
                                 <button
                                     type="button"
                                     onClick={() => { setShowModal(false); setSelectedPayment(null); }}
-                                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold rounded-xl transition-all border border-white/5"
+                                    className="flex-1 px-4 py-3 font-semibold rounded-xl transition-all"
+                                    style={{ background: 'var(--nm-bg)', boxShadow: '4px 4px 10px var(--nm-sd), -4px -4px 10px var(--nm-sl)', color: 'var(--nm-text-2)' }}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleCompletePayment}
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-900/20"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl transition-all shadow-lg"
                                 >
                                     Complete Payment
                                 </button>
